@@ -5,6 +5,6 @@ import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
-router.post("/generate", requireAuth(), extractCvText, aiGeneratedCv);
+router.post("/generate", extractCvText, aiGeneratedCv);
 
 export default router;

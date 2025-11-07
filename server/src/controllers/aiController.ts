@@ -73,61 +73,55 @@ const cvResponseSchema = {
 
 export const aiGeneratedCv = async (req: Request, res: Response) => {
   const { jobTitle, jobDescription, previousCv, notes, companyInfo } = req.body;
-  const { userId }: any = getAuth(req);
-  const user = await clerkClient.users.getUser(userId);
-  // if (!jobDescription || !previousCv) {
-  //   return res.status(400).json({ error: "Missing required CV data." });
-  // }
 
-  // const ai = new GoogleGenAI({ apiKey: key });
+  if (!jobDescription || !previousCv) {
+    return res.status(400).json({ error: "Missing required CV data." });
+  }
 
-  // const prompt = `
-  //       You are an expert HR and CV specialist. Your task is to revise and tailor the provided CV content to perfectly match the requirements of the specified job description.
+  const ai = new GoogleGenAI({ apiKey: key });
 
-  //       Your entire output MUST be a JSON object adhering to the provided schema. The field names must match exactly.
+  const prompt = `
+        You are an expert HR and CV specialist. Your task is to revise and tailor the provided CV content to perfectly match the requirements of the specified job description.
 
-  //       --- INPUT DATA ---
-  //       TARGET JOB TITLE: ${jobTitle}
-  //       TARGET JOB DESCRIPTION: ${jobDescription}
-  //       TARGET COMPANY INFORMATION: ${companyInfo}
-  //       CANDIDATE'S PREVIOUS CV CONTENT: ${previousCv}
-  //       CANDIDATE NOTES/PREFERENCES: ${notes || "None"}
+        Your entire output MUST be in JSON object format adhering to the provided schema. The field names must match exactly.
 
-  //       --- INSTRUCTIONS ---
-  //       1. Fill the JSON fields.
-  //       2. Specifically, fill the 'contact' object with email, phone, location, LinkedIn URL, and GitHub URL if available in the previous CV content.
-  //       3. Tailor the 'summary' and 'experience' 'achievements' arrays to the job description, using keywords and quantifying achievements where possible.
-  //       4. Structure all 'experience' and 'education' entries as arrays of objects as defined in the schema.
-  //       5. Ensure the output is only the raw JSON string.
-  //   `;
+        --- INPUT DATA ---
+        TARGET JOB TITLE: ${jobTitle}
+        TARGET JOB DESCRIPTION: ${jobDescription}
+        TARGET COMPANY INFORMATION: ${companyInfo}
+        CANDIDATE'S PREVIOUS CV CONTENT: ${previousCv}
+        CANDIDATE NOTES/PREFERENCES: ${notes || "None"}
+
+        --- INSTRUCTIONS ---
+        1. Fill the JSON fields.
+        2. Specifically, fill the 'contact' object with email, phone, location, LinkedIn URL, and GitHub URL if available in the previous CV content.
+        3. Tailor the 'summary' and 'experience' 'achievements' arrays to the job description, using keywords and quantifying achievements where possible.
+        4. Structure all 'experience' and 'education' entries as arrays of objects as defined in the schema.
+        5. Ensure the output is only in JSON format in the same structure of the provided schema.
+        6. Always give a unique output for queries even if the input is same.
+    `;
 
   try {
-    // const response = await ai.models.generateContent({
-    //   model: "gemini-2.5-flash",
-    //   contents: prompt,
-    //   config: {
-    //     temperature: 0.6,
-    //     responseMimeType: "application/json",
-    //     responseSchema: cvResponseSchema,
-    //   },
-    // });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        temperature: 1.5,
+        responseMimeType: "application/json",
+        responseSchema: cvResponseSchema,
+      },
+    });
+    let tailoredCv = "";
+    const jsonString = response.text;
+    if (jsonString) {
+      tailoredCv = JSON.parse(jsonString);
+    }
 
-    // const jsonString = response; //get path to data later
-    //const tailoredCv = JSON.parse(jsonString);
-
-    res
-      .status(200)
-      .json({
-        jobTitle,
-        jobDescription,
-        previousCv,
-        notes,
-        companyInfo,
-        user: user,
-        userId,
-      });
+    return res.status(200).json({
+      tailoredCv,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to generate CV from AI." });
+    return res.status(500).json({ error: "Failed to generate CV from AI." });
   }
 };

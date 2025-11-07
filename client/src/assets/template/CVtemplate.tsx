@@ -1,6 +1,39 @@
 // CVTemplate.tsx
 import React from "react";
 
+interface CVDta {
+  name: string;
+  title: string; // The main professional title (e.g., Senior Node.js Developer)
+  summary: string; // The introductory paragraph, tailored to the job description
+
+  // --- Core Header Information ---
+  contact: {
+    email: string;
+    phone?: string; // Made optional, as it's not always required
+    location: string;
+    linkedinUrl?: string; // Added: Essential for professional networking
+    githubUrl?: string; // Added: Crucial for showcasing technical work
+  };
+
+  // --- Work Experience Section ---
+  experience: {
+    role: string;
+    company: string;
+    duration: string; // e.g., "Jan 2021 - Present"
+    achievements: string[]; // Corrected: Renamed from 'details' for better semantics
+  }[]; // This array structure ensures scalability for multiple jobs
+
+  // --- Education Section ---
+  education: {
+    school: string;
+    degree: string;
+    durationOrYear: string; // Corrected: Renamed from 'year' for flexibility
+  }[]; // This array structure ensures scalability for multiple degrees/certs
+
+  // --- Skills and Additional Sections ---
+  skills: string[]; // Simple array of keywords/tools (e.g., ["TypeScript", "Kafka", "AWS"])
+  awardsAndCertifications?: string[]; // Added: An optional section for quick reference
+}
 interface CVData {
   name: string;
   title: string;
@@ -42,7 +75,9 @@ const CVTemplate: React.FC<CVTemplateProps> = ({ data }) => {
 
       {/* Summary */}
       <section className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">Profile Summary</h3>
+        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          Profile Summary
+        </h3>
         <p className="text-gray-600 leading-relaxed">{data.summary}</p>
       </section>
 
@@ -67,9 +102,13 @@ const CVTemplate: React.FC<CVTemplateProps> = ({ data }) => {
         {data.experience.map((exp, idx) => (
           <div key={idx} className="mb-4">
             <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
-            <p className="text-sm text-gray-500">{exp.company} • {exp.duration}</p>
+            <p className="text-sm text-gray-500">
+              {exp.company} • {exp.duration}
+            </p>
             <ul className="list-disc list-inside text-gray-600 mt-2">
-              {exp.details.map((d, i) => <li key={i}>{d}</li>)}
+              {exp.details.map((d, i) => (
+                <li key={i}>{d}</li>
+              ))}
             </ul>
           </div>
         ))}
