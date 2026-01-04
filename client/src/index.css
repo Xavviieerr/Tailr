@@ -1,6 +1,58 @@
 @import "tailwindcss";
 
-
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #cv-template,
+  #cv-template * {
+    visibility: visible;
+  }
+  #cv-template {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
+
+@keyframes honeycomb-animation {
+  0%,
+  20%,
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.honeycomb-cell {
+  animation: honeycomb-animation 2.1s infinite backwards;
+}
+
+.honeycomb-cell:after,
+.honeycomb-cell:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+}
+
+.honeycomb-cell:after {
+  top: -6px;
+  border-bottom: 6px solid #212774;
+}
+
+.honeycomb-cell:before {
+  bottom: -6px;
+  border-top: 6px solid #212774;
 }

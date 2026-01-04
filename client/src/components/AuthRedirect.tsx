@@ -10,7 +10,7 @@ export default function AuthRedirect() {
     if (isSignedIn) {
       navigate("/dashboard");
     }
-  }, [isSignedIn, navigate]);
+  }, [isSignedIn]);
 
   return null;
 }
