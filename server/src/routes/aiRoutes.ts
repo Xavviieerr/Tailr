@@ -1,10 +1,10 @@
 import express from "express";
-import { aiGeneratedCv } from "../controllers/aiController";
+import { aiGenerateCv } from "../controllers/aiController";
 import { extractCvText } from "../middleware/previousCvParser";
 import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
-router.post("/generate", extractCvText, aiGeneratedCv);
+router.post("/generate", extractCvText, aiGenerateCv);
 
 export default router;

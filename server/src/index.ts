@@ -13,12 +13,12 @@ const PORT = process.env.PORT;
 //middleware
 app.use(express.json());
 app.use(cors());
-app.use(clerkMiddleware());
+//app.use(clerkMiddleware());
 
 //routes
 app.use("/api/cv", cvRoutes);
 app.use("/api/ai", aiRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server is listening on http://localhost:${PORT}`);
+	console.log(`Server is listening on http://localhost:${PORT}`);
 });
