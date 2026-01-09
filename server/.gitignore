@@ -4,3 +4,7 @@ npm-debug.log
 /node_modules
 /dist
 /src/generated/prisma
+
+/src/generated/prisma
+
+/src/generated/prisma
