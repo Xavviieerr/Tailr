@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cvRoutes from "./routes/cvRoutes";
 import aiRoutes from "./routes/aiRoutes";
+import userRoutes from "./routes/userRoute";
 import { clerkMiddleware } from "@clerk/express";
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cors());
 //routes
 app.use("/api/cv", cvRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/user", userRoutes);
 
 app.listen(PORT, () => {
 	console.log(`Server is listening on http://localhost:${PORT}`);
