@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../../lib/prisma";
 
 export const allUserCv = (req: Request, res: Response) => {
 	res.status(200).json({ message: "energy is different" });

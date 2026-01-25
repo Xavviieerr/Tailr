@@ -3,7 +3,7 @@ import {
 	allUserCv,
 	createTestCV,
 	// getAllCVs,
-} from "../controllers/cvController";
+} from "../cv/cvController";
 
 const router = express.Router();
 
