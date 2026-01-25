@@ -8,8 +8,7 @@ import { clerkMiddleware } from "@clerk/express";
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT;
+export const app = express();
 
 //middleware
 app.use(express.json());
@@ -21,6 +20,4 @@ app.use("/api/cv", cvRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/user", userRoutes);
 
-app.listen(PORT, () => {
-	console.log(`Server is listening on http://localhost:${PORT}`);
-});
+export default app;
