@@ -1,9 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import cvRoutes from "./routes/cvRoutes";
-import aiRoutes from "./routes/aiRoutes";
-import userRoutes from "./routes/userRoute";
+import cvRoutes from "./modules/cv/cvRoutes";
+import aiRoutes from "./modules/ai/aiRoutes";
+import userRoutes from "./modules/user/userRoute";
 import { clerkMiddleware } from "@clerk/express";
 
 dotenv.config();
