@@ -4,5 +4,5 @@ import { requireClerkAuth } from "../../middleware/clerkAuthMiddleware";
 
 const router = express.Router();
 
-router.post("/", requireClerkAuth, newUser);
+router.post("/newUser", newUser);
 export default router;

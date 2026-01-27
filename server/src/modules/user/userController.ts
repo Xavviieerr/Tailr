@@ -1,7 +1,17 @@
 import { Request, Response } from "express";
+import { AuthRequest } from "../../types/authRequest";
 
-export const newUser = (req: Request, res: Response) => {
-	res.status(200).json({ message: "energy is different" });
+interface NewUserBody {
+	email: string;
+	firstName?: string;
+	lastName?: string;
+}
+
+export const newUser = (req: AuthRequest<NewUserBody>, res: Response) => {
+	console.log(req.auth);
+	console.log("headers:", req.headers["content-type"]);
+	console.log(req.body);
+	res.status(200).json({ message: "Working" });
 };
 
 // export const syncUser = async (req, res) => {
