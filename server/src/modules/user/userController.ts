@@ -9,10 +9,6 @@ interface NewUserBody {
 }
 
 export const newUser = async (req: AuthRequest<NewUserBody>, res: Response) => {
-	console.log(req.auth);
-	console.log("headers:", req.headers["content-type"]);
-	console.log(req.body);
-
 	const { firstName, lastName, email } = req.body;
 
 	if (!firstName || !lastName) {
@@ -31,8 +27,8 @@ export const newUser = async (req: AuthRequest<NewUserBody>, res: Response) => {
 	return res.status(200).json(user);
 };
 
-// export const getMe = async (req, res) => {
-// 	const user = await userService.getUserByClerkId(req.auth.userId);
+export const getMe = async (req: AuthRequest, res: Response) => {
+	const user = await userService.getUserByClerkId(req.auth!.clerkUserId);
 
-// 	res.status(200).json(user);
-// };
+	res.status(200).json(user);
+};
