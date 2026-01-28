@@ -12,16 +12,14 @@ export const newUser = (req: AuthRequest<NewUserBody>, res: Response) => {
 	console.log("headers:", req.headers["content-type"]);
 	console.log(req.body);
 	res.status(200).json({ message: "Working" });
+
+	// const user = await userService.syncUser({
+	// 	clerkUserId: req.auth.userId,
+	// 	email: req.auth.email,
+	// });
+
+	//res.status(200).json(user);
 };
-
-// export const syncUser = async (req, res) => {
-// 	const user = await userService.syncUser({
-// 		clerkUserId: req.auth.userId,
-// 		email: req.auth.email,
-// 	});
-
-// 	res.status(200).json(user);
-// };
 
 // export const getMe = async (req, res) => {
 // 	const user = await userService.getUserByClerkId(req.auth.userId);

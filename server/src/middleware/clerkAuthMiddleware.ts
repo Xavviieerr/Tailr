@@ -7,6 +7,7 @@ export const requireClerkAuth = (
 	res: Response,
 	next: NextFunction,
 ) => {
+	console.log("In requireClerkAuth middleware");
 	if (process.env.NODE_ENV === "development" && req.auth?.clerkUserId) {
 		console.log(req.auth?.clerkUserId);
 		return next();

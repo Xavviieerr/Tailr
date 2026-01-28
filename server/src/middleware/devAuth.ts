@@ -7,6 +7,7 @@ export const devAuth = (
 	_res: Response,
 	next: NextFunction,
 ) => {
+	console.log("In devAuth middleware");
 	req.auth = {
 		clerkUserId: "user_dev_123",
 	};

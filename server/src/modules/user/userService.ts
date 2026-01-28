@@ -5,29 +5,43 @@
 // Expose plan & limits
 // Act as gatekeeper for other modules
 
-// import * as userRepo from "./userRepository";
+import * as userRepo from "./userRepository";
 
-// export const syncUser = async ({ clerkUserId, email }) => {
-// 	const existingUser = await userRepo.findByClerkId(clerkUserId);
+interface NewUserInput {
+	clerkUserId: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+}
 
-// 	if (existingUser) {
-// 		return existingUser;
-// 	}
+export const syncUser = async ({
+	clerkUserId,
+	email,
+	firstName,
+	lastName,
+}: NewUserInput) => {
+	const existingUser = await userRepo.findByClerkId(clerkUserId);
 
-// 	// First-time user
-// 	return userRepo.createUser({
-// 		clerkUserId,
-// 		email,
-// 		plan: "FREE",
-// 	});
-// };
+	if (existingUser) {
+		return existingUser;
+	}
 
-// export const getUserByClerkId = async (clerkUserId: string) => {
-// 	const user = await userRepo.findByClerkId(clerkUserId);
+	// First-time user
+	return userRepo.createUser({
+		clerkId: clerkUserId,
+		email,
+		firstName,
+		lastName,
+		updatedAt: new Date(),
+	});
+};
 
-// 	if (!user) {
-// 		throw new Error("User not found");
-// 	}
+export const getUserByClerkId = async (clerkUserId: string) => {
+	const user = await userRepo.findByClerkId(clerkUserId);
 
-// 	return user;
-// };
+	if (!user) {
+		throw new Error("User not found");
+	}
+
+	return user;
+};

@@ -1,9 +1,13 @@
-// export const findByClerkId = async (clerkUserId: string) => {
-// 	return prisma.user.findUnique({
-// 		where: { clerkUserId },
-// 	});
-// };
+import { prisma } from "../../lib/prisma";
+import Prisma from "@prisma/client";
+import { UserCreateInput } from "../../../generated/prisma/models/User";
 
-// export const createUser = async (data) => {
-// 	return prisma.user.create({ data });
-// };
+export const findByClerkId = async (clerkId: string) => {
+	return prisma.user.findUnique({
+		where: { clerkId },
+	});
+};
+
+export const createUser = async (data: UserCreateInput) => {
+	return prisma.user.create({ data });
+};
