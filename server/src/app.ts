@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 //routes
-app.use("/api/cv", cvRoutes);
+app.use("/api/cvs", cvRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/user", userRoutes);
 

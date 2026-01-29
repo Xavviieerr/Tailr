@@ -29,3 +29,7 @@ export const createCvService = async ({
 		updatedAt: new Date(),
 	});
 };
+
+export const getCvsByUserId = async (userId: number) => {
+	return cvRepo.findByUserId(userId);
+};

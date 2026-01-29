@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { prisma } from "../../lib/prisma";
 import { AuthRequest } from "../../types/authRequest";
 import * as cvService from "./cvService";
 import * as userService from "../user/userService";
@@ -43,21 +42,10 @@ export const createCV = async (
 	return res.status(201).json(cv);
 };
 
-export const allUserCv = (req: Request, res: Response) => {
-	res.status(200).json({ message: "energy is different" });
+export const getMyCvs = async (req: AuthRequest, res: Response) => {
+	const { clerkUserId } = req.auth!;
+	const user = await userService.requireUserByClerkId(clerkUserId);
+	const cvs = await cvService.getCvsByUserId(user.id);
+
+	res.json(cvs);
 };
-
-// export const getAllCVs = async (req: Request, res: Response) => {
-// 	try {
-// 		const cvs = await Prisma.User.findMany({
-// 			orderBy: {
-// 				createdAt: "desc",
-// 			},
-// 		});
-
-// 		return res.status(200).json(cvs);
-// 	} catch (error) {
-// 		console.error(error);
-// 		return res.status(500).json({ error: "Failed to fetch CVs" });
-// 	}
-// };

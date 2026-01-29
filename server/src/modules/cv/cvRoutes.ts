@@ -1,11 +1,18 @@
 import express from "express";
-import { allUserCv, createCV } from "../cv/cvController";
+import { getMyCvs, createCV } from "../cv/cvController";
 import { requireClerkAuth } from "../../middleware/clerkAuthMiddleware";
 
 const router = express.Router();
 
-router.post("/create", requireClerkAuth, createCV);
-// router.get("/test-all", getAllCVs);
+router.post("/", requireClerkAuth, createCV);
+router.get("/", requireClerkAuth, getMyCvs);
+
+// router.post("/", requireClerkAuth, createCv);
+// router.get("/", requireClerkAuth, getMyCvs);
+// router.get("/:id", requireClerkAuth, getCvById);
+// router.patch("/:id", requireClerkAuth, updateCv);
+// router.delete("/:id", requireClerkAuth, deleteCv);
+
 export default router;
 
 // Creating CV records

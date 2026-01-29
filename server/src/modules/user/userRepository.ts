@@ -1,5 +1,4 @@
 import { prisma } from "../../lib/prisma";
-import Prisma from "@prisma/client";
 import { UserCreateInput } from "../../../generated/prisma/models/User";
 
 export const findByClerkId = async (clerkId: string) => {
