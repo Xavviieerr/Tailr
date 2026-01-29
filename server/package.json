@@ -1,39 +1,41 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.ts",
-    "start": "node dist/index.js",
-    "build": "tsc"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@clerk/clerk-sdk-node": "^5.1.6",
-    "@clerk/express": "^1.7.45",
-    "@google/genai": "^1.28.0",
-    "@prisma/client": "^6.18.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "mammoth": "^1.11.0",
-    "multer": "^2.0.2",
-    "pdf-parse": "^2.4.5",
-    "pg": "^8.16.3",
-    "prisma": "^6.18.0"
-  },
-  "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.5",
-    "@types/multer": "^2.0.0",
-    "@types/node": "^24.9.2",
-    "@types/pg": "^8.15.6",
-    "nodemon": "^3.1.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  }
+	"name": "server",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "nodemon src/server.ts",
+		"start": "node dist/server.js",
+		"build": "tsc"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@clerk/clerk-sdk-node": "^5.1.6",
+		"@clerk/express": "^1.7.45",
+		"@google/genai": "^1.28.0",
+		"@prisma/adapter-pg": "^7.2.0",
+		"@prisma/client": "^7.2.0",
+		"cors": "^2.8.5",
+		"express": "^5.1.0",
+		"mammoth": "^1.11.0",
+		"multer": "^2.0.2",
+		"pdf-parse": "^2.4.5",
+		"pg": "^8.16.3"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.5",
+		"@types/multer": "^2.0.0",
+		"@types/node": "^24.10.7",
+		"@types/pg": "^8.16.0",
+		"dotenv": "^17.2.3",
+		"nodemon": "^3.1.10",
+		"prisma": "^7.2.0",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3"
+	}
 }
