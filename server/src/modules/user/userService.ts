@@ -1,11 +1,20 @@
-// User Service
-
-// Ensure user exists (sync)
-// Retrieve user profile
-// Expose plan & limits
-// Act as gatekeeper for other modules
-
 import * as userRepo from "./userRepository";
+
+//checsk if user exists by clerk id
+export const findUserByClerkId = async (clerkUserId: string) => {
+	return userRepo.findByClerkId(clerkUserId);
+};
+
+//throws error if user does not exist
+export const requireUserByClerkId = async (clerkUserId: string) => {
+	const user = await userRepo.findByClerkId(clerkUserId);
+
+	if (!user) {
+		throw new Error("User does not exist");
+	}
+
+	return user;
+};
 
 interface NewUserInput {
 	clerkUserId: string;
@@ -26,7 +35,6 @@ export const syncUser = async ({
 		return existingUser;
 	}
 
-	// First-time user
 	return userRepo.createUser({
 		clerkId: clerkUserId,
 		email,
