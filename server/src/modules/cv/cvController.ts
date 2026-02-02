@@ -3,6 +3,10 @@ import { AuthRequest } from "../../types/authRequest";
 import * as cvService from "./cvService";
 import * as userService from "../user/userService";
 
+type CvParams = {
+	id: string;
+};
+
 interface CreateCvBody {
 	name: string;
 	jobTitle: string;
@@ -48,4 +52,15 @@ export const getMyCvs = async (req: AuthRequest, res: Response) => {
 	const cvs = await cvService.getCvsByUserId(user.id);
 
 	res.json(cvs);
+};
+
+export const getCvById = async (
+	req: AuthRequest & Request<CvParams>,
+	res: Response,
+) => {
+	const cvId = req.params.id;
+	const { clerkUserId } = req.auth!;
+
+	console.log(cvId, clerkUserId);
+	res.send("Get CV by ID");
 };

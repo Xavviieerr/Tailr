@@ -1,11 +1,12 @@
 import express from "express";
-import { getMyCvs, createCV } from "../cv/cvController";
+import { getMyCvs, createCV, getCvById } from "../cv/cvController";
 import { requireClerkAuth } from "../../middleware/clerkAuthMiddleware";
 
 const router = express.Router();
 
 router.post("/", requireClerkAuth, createCV);
 router.get("/", requireClerkAuth, getMyCvs);
+router.get("/:id", requireClerkAuth, getCvById);
 
 // router.post("/", requireClerkAuth, createCv);
 // router.get("/", requireClerkAuth, getMyCvs);

@@ -5,4 +5,5 @@ export interface AuthRequest<TBody = any> extends Request<{}, any, TBody> {
 		clerkUserId: string;
 		email?: string;
 	};
+	id?: string;
 }
