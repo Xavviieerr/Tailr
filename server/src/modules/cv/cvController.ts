@@ -81,7 +81,16 @@ export const updateCv = async (
 ) => {
 	const cvId = Number(req.params.id);
 	const { clerkUserId } = req.auth!;
-	console.log(clerkUserId, cvId);
-	// Implementation for updating a CV will go here
-	res.status(501).json({ error: "Not implemented" });
+	const data = req.body;
+
+	const user = await userService.getUserByClerkId(clerkUserId);
+
+	const updatedCv = await cvService.updateCvByIdForUser(cvId, user.id, data);
+
+	if (!updatedCv) {
+		return res.status(404).json({ message: "CV not found" });
+	}
+	const cv = await cvService.getCvByIdForUser(cvId, user.id);
+
+	return res.status(200).json(cv);
 };

@@ -1,3 +1,4 @@
+import { JsonObject } from "@prisma/client/runtime/client";
 import { CvCreateInput } from "../../../generated/prisma/models/Cv";
 import { prisma } from "../../lib/prisma";
 
@@ -23,4 +24,22 @@ export const findByIdAndUserId = (cvId: number, userId: number) => {
 			userId,
 		},
 	});
+};
+
+export const updateCvByIdAndUserId = (
+	cvId: number,
+	userId: number,
+	data: JsonObject,
+) => {
+	return prisma.cv.updateMany({
+		where: {
+			id: cvId,
+			userId: userId,
+		},
+		data: {
+			content: data,
+			updatedAt: new Date(),
+		},
+	});
+	//console.log(typeof data, typeof cvId, typeof userId);
 };
