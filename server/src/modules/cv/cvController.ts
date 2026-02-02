@@ -74,3 +74,14 @@ export const getCvById = async (
 
 	return res.json(cv);
 };
+
+export const updateCv = async (
+	req: AuthRequest & Request<CvParams>,
+	res: Response,
+) => {
+	const cvId = Number(req.params.id);
+	const { clerkUserId } = req.auth!;
+	console.log(clerkUserId, cvId);
+	// Implementation for updating a CV will go here
+	res.status(501).json({ error: "Not implemented" });
+};
