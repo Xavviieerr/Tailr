@@ -15,3 +15,12 @@ export const findByUserId = (userId: number) => {
 		},
 	});
 };
+
+export const findByIdAndUserId = (cvId: number, userId: number) => {
+	return prisma.cv.findFirst({
+		where: {
+			id: cvId,
+			userId,
+		},
+	});
+};

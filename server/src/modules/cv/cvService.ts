@@ -33,3 +33,7 @@ export const createCvService = async ({
 export const getCvsByUserId = async (userId: number) => {
 	return cvRepo.findByUserId(userId);
 };
+
+export const getCvByIdForUser = async (cvId: number, userId: number) => {
+	return cvRepo.findByIdAndUserId(cvId, userId);
+};

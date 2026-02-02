@@ -4,7 +4,7 @@ import * as cvService from "./cvService";
 import * as userService from "../user/userService";
 
 type CvParams = {
-	id: string;
+	id: number;
 };
 
 interface CreateCvBody {
@@ -58,9 +58,19 @@ export const getCvById = async (
 	req: AuthRequest & Request<CvParams>,
 	res: Response,
 ) => {
-	const cvId = req.params.id;
 	const { clerkUserId } = req.auth!;
+	const cvId = Number(req.params.id);
 
-	console.log(cvId, clerkUserId);
-	res.send("Get CV by ID");
+	if (Number.isNaN(cvId)) {
+		return res.status(400).json({ error: "Invalid CV id" });
+	}
+
+	const user = await userService.requireUserByClerkId(clerkUserId);
+	const cv = await cvService.getCvByIdForUser(cvId, user.id);
+
+	if (!cv) {
+		return res.status(404).json({ error: "CV not found" });
+	}
+
+	return res.json(cv);
 };
