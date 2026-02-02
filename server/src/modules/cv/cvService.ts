@@ -48,3 +48,7 @@ export const updateCvByIdForUser = async (
 ) => {
 	return cvRepo.updateCvByIdAndUserId(cvId, userId, data);
 };
+
+export const deleteCvByIdForUser = async (cvId: number, userId: number) => {
+	return cvRepo.deleteCvByIdAndUserId(cvId, userId);
+};

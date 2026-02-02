@@ -94,3 +94,20 @@ export const updateCv = async (
 
 	return res.status(200).json(cv);
 };
+
+export const deleteCv = async (
+	req: AuthRequest & Request<CvParams>,
+	res: Response,
+) => {
+	const cvId = Number(req.params.id);
+	const { clerkUserId } = req.auth!;
+	const user = await userService.getUserByClerkId(clerkUserId);
+
+	const deleted = await cvService.deleteCvByIdForUser(cvId, user.id);
+
+	if (!deleted) {
+		return res.status(404).json({ message: "CV not found" });
+	}
+
+	return res.status(204).send();
+};

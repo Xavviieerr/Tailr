@@ -1,5 +1,11 @@
 import express from "express";
-import { getMyCvs, createCV, getCvById, updateCv } from "../cv/cvController";
+import {
+	getMyCvs,
+	createCV,
+	getCvById,
+	updateCv,
+	deleteCv,
+} from "../cv/cvController";
 import { requireClerkAuth } from "../../middleware/clerkAuthMiddleware";
 
 const router = express.Router();
@@ -8,12 +14,7 @@ router.post("/", requireClerkAuth, createCV);
 router.get("/", requireClerkAuth, getMyCvs);
 router.get("/:id", requireClerkAuth, getCvById);
 router.patch("/:id", requireClerkAuth, updateCv);
-
-// router.post("/", requireClerkAuth, createCv);
-// router.get("/", requireClerkAuth, getMyCvs);
-// router.get("/:id", requireClerkAuth, getCvById);
-// router.patch("/:id", requireClerkAuth, updateCv);
-// router.delete("/:id", requireClerkAuth, deleteCv);
+router.delete("/:id", requireClerkAuth, deleteCv);
 
 export default router;
 

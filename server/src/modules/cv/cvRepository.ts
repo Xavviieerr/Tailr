@@ -43,3 +43,12 @@ export const updateCvByIdAndUserId = (
 	});
 	//console.log(typeof data, typeof cvId, typeof userId);
 };
+
+export const deleteCvByIdAndUserId = (cvId: number, userId: number) => {
+	return prisma.cv.deleteMany({
+		where: {
+			id: cvId,
+			userId: userId,
+		},
+	});
+};
