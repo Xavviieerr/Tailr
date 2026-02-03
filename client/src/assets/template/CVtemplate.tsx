@@ -1,39 +1,34 @@
-// CVTemplate.tsx
 import React, { useEffect, useState } from "react";
 
-interface CVDta {
-	name: string;
-	title: string; // The main professional title (e.g., Senior Node.js Developer)
-	summary: string; // The introductory paragraph, tailored to the job description
+// interface CVDta {
+// 	name: string;
+// 	title: string;
+//   summary: string;
 
-	// --- Core Header Information ---
-	contact: {
-		email: string;
-		phone?: string; // Made optional, as it's not always required
-		location: string;
-		linkedinUrl?: string; // Added: Essential for professional networking
-		githubUrl?: string; // Added: Crucial for showcasing technical work
-	};
+// 	contact: {
+// 		email: string;
+// 		phone?: string;
+// 		location: string;
+// 		linkedinUrl?: string;
+// 		githubUrl?: string;
+// 	};
 
-	// --- Work Experience Section ---
-	experience: {
-		role: string;
-		company: string;
-		duration: string; // e.g., "Jan 2021 - Present"
-		achievements: string[]; // Corrected: Renamed from 'details' for better semantics
-	}[]; // This array structure ensures scalability for multiple jobs
+// 	experience: {
+// 		role: string;
+// 		company: string;
+// 		duration: string;
+// 		achievements: string[];
+// 	}[];
 
-	// --- Education Section ---
-	education: {
-		school: string;
-		degree: string;
-		durationOrYear: string; // Corrected: Renamed from 'year' for flexibility
-	}[]; // This array structure ensures scalability for multiple degrees/certs
+// 	education: {
+// 		school: string;
+// 		degree: string;
+// 		durationOrYear: string;
+// 	}[];
 
-	// --- Skills and Additional Sections ---
-	skills: string[]; // Simple array of keywords/tools (e.g., ["TypeScript", "Kafka", "AWS"])
-	awardsAndCertifications?: string[]; // Added: An optional section for quick reference
-}
+// 	skills: string[];
+// 	awardsAndCertifications?: string[];
+// }
 interface CVData {
 	name: string;
 	title: string;
@@ -59,8 +54,8 @@ interface CVData {
 
 interface CVTemplateProps {
 	data: CVData;
-	editable?: boolean; // when true fields are editable in-place
-	onChange?: (updated: CVData) => void; // optional callback when content changes
+	editable?: boolean;
+	onChange?: (updated: CVData) => void;
 }
 
 const CVTemplate: React.FC<CVTemplateProps> = ({
