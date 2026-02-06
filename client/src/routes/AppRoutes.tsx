@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, useAuth } from "@clerk/clerk-react";
 
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
@@ -11,57 +11,41 @@ import Dashboard from "../pages/Dashboard";
 import DashboardHome from "../pages/DashboardHome";
 import DashboardApplications from "../pages/DashboardApplications";
 import DashboardProfile from "../pages/DashboardProfile";
+import Loader from "../components/Loader";
 
 const AppRoutes = () => {
+	const { isLoaded, isSignedIn } = useAuth();
+
+	if (!isLoaded) {
+		return <Loader />;
+	}
 	return (
 		<BrowserRouter>
 			<Routes>
-				{/* ===================== */}
 				{/* Public Auth Routes */}
-				{/* ===================== */}
+				<Route path="/login/*" element={<Login />} />
+				<Route path="/sign-up/*" element={<Signup />} />
 
-				<Route path="/login" element={<Login />} />
-				<Route path="/sign-up" element={<Signup />} />
-				{/* Todo: Fix sign up route another day to sure bug not from me. */}
-
-				{/* ===================== */}
 				{/* Root Redirect */}
-				{/* ===================== */}
 				<Route
 					path="/"
 					element={
-						<>
-							<SignedIn>
-								<Navigate to="/dashboard" replace />
-							</SignedIn>
-
-							<SignedOut>
+						isSignedIn ? (
+							<Navigate to="/dashboard" replace />
+						) : (
+							<>
 								<Navbar />
 								<Home />
-							</SignedOut>
-
-							{/* <SignedOut>
-								<Navigate to="/login" replace />
-							</SignedOut> */}
-						</>
+							</>
+						)
 					}
 				/>
-				{/* ===================== */}
+
 				{/* Protected Dashboard */}
-				{/* ===================== */}
 				<Route
 					path="/dashboard"
 					element={
-						<>
-							<SignedIn>
-								<Dashboard />
-							</SignedIn>
-
-							<SignedOut>
-								{/* <RedirectToSignIn redirectUrl="/login" /> */}
-								<Navigate to="/login" replace />
-							</SignedOut>
-						</>
+						isSignedIn ? <Dashboard /> : <Navigate to="/login" replace />
 					}
 				>
 					<Route index element={<Navigate to="/dashboard/home" replace />} />
@@ -69,8 +53,8 @@ const AppRoutes = () => {
 					<Route path="applications" element={<DashboardApplications />} />
 					<Route path="profile" element={<DashboardProfile />} />
 				</Route>
+
 				{/* Fallback Route */}
-				{/* ===================== */}
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Routes>
 		</BrowserRouter>
