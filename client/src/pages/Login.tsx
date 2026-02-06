@@ -3,11 +3,11 @@ import AuthSideInfo from "../components/AuthSideInfo";
 
 const Login = () => (
 	<div>
-		<div className="flex justify-evenly items-center min-h-screen gap-[6%]  px-[10%]">
-			<div className="flex-1/2 md:hidden sm:hidden lg:block h-auto">
+		<div className="flex justify-evenly items-center min-h-screen gap-[1%]  px-[10%]">
+			<div className="flex-1/2 md:hidden sm:hidden lg:block h-auto p-7">
 				<AuthSideInfo />
 			</div>
-			<div className="mx-5">
+			<div className="mx-5 mr-[9%]">
 				<SignIn path="/login" routing="path" signUpUrl="/sign-up" />
 			</div>
 		</div>
