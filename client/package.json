@@ -12,12 +12,14 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.53.2",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
+    "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/vite": "^4.1.13",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.546.0",
     "ogl": "^1.0.11",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.4",
     "styled-components": "^6.1.19",
     "tailwindcss": "^4.1.13"

@@ -233,39 +233,43 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
 
 			{/* Education */}
 			<section>
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">Education</h3>
-				{cv.education.map((edu, idx) => (
-					<div key={idx} className="mb-2">
-						<p
-							className="font-medium text-gray-800"
-							contentEditable={editable}
-							suppressContentEditableWarning
-							data-path={`education.${idx}.school`}
-							onInput={handleInput}
-						>
-							{edu.school}
-						</p>
-						<p className="text-sm text-gray-500">
-							<span
+				<h3 className="text-xl font-semibold text-gray-700 mb-2 flex flex-wrap gap-2">
+					Education
+				</h3>
+				<div className="flex flex-wrap gap-5">
+					{cv.education.map((edu, idx) => (
+						<div key={idx} className="mb-2">
+							<p
+								className="font-medium text-gray-800"
 								contentEditable={editable}
 								suppressContentEditableWarning
-								data-path={`education.${idx}.degree`}
+								data-path={`education.${idx}.school`}
 								onInput={handleInput}
 							>
-								{edu.degree}
-							</span>{" "}
-							•{" "}
-							<span
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`education.${idx}.year`}
-								onInput={handleInput}
-							>
-								{edu.year}
-							</span>
-						</p>
-					</div>
-				))}
+								{edu.school}
+							</p>
+							<p className="text-sm text-gray-500">
+								<span
+									contentEditable={editable}
+									suppressContentEditableWarning
+									data-path={`education.${idx}.degree`}
+									onInput={handleInput}
+								>
+									{edu.degree}
+								</span>{" "}
+								•{" "}
+								<span
+									contentEditable={editable}
+									suppressContentEditableWarning
+									data-path={`education.${idx}.year`}
+									onInput={handleInput}
+								>
+									{edu.year}
+								</span>
+							</p>
+						</div>
+					))}
+				</div>
 			</section>
 		</div>
 	);
