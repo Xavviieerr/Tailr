@@ -1,171 +1,94 @@
-import { FileText } from "lucide-react";
-import React, { useEffect, useState, type ChangeEvent } from "react";
+import React from "react";
+import { useUser } from "@clerk/clerk-react";
 import Loader from "../components/Loader";
 
-interface ProfileInfo {
-	firstname: string;
-	lastname: string;
-	email: string;
-	status: "user" | "admin";
-}
-const initialProfileState: ProfileInfo = {
-	firstname: "maria",
-	lastname: "fernanda",
-	email: "mariafernanda@gmail.com",
-	status: "user",
-};
 const DashboardProfile = () => {
-	const [readOnly, setReadOnly] = useState(true);
-	const [profileInfo, setProfileInfo] =
-		useState<ProfileInfo>(initialProfileState);
+	const { isLoaded, user } = useUser();
 
-	const [loading, setLoading] = useState(true);
-
-	const handleEdit = () => {
-		setReadOnly(false);
-	};
-
-	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e?.target;
-
-		setProfileInfo((prevInfo) => ({
-			...prevInfo,
-			[name]: value,
-		}));
-	};
-
-	const handleSave = () => {
-		setReadOnly(true);
-	};
-	return (
-		<div className=" flex flex-col px-20 ">
-			{/* <Loader /> */}
-			<div className="flex flex-col border-b-2  border-gray-400 mx-3 my-5 py-2">
-				<span className="text-2xl font-bold text-gray-700">Profile</span>
-				<span>View all your profile details here.</span>
+	if (!isLoaded) {
+		return <Loader />;
+	}
+	if (!user) {
+		return (
+			<div className="p-10 text-center">
+				No user session found. Please log in.
 			</div>
-			<div className="h-auto w-full p-3 flex gap-5 rounded-lg my-4 border-b-2 rounded-b-lg border-gray-500">
-				<div className="h-auto shadow-md p-3 w-2/6 rounded-md items-center flex flex-col gap-1 ">
-					<span className="font-bold text-xl">
-						{profileInfo.firstname} {profileInfo.lastname}
-					</span>
-					<span className="text-sm">Admin</span>
-					<div className="rounded-full p-3 w-[80%] bg-gray-400">
+		);
+	}
+
+	return (
+		<div className="max-w-3xl mx-auto p-4 sm:p-8">
+			<div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+				<div className="h-32 bg-gradient-to-r from-[#212774] to-[#3a45c2]" />
+
+				<div className="px-8 pb-8">
+					<div className="relative -mt-16 mb-6">
 						<img
-							src="/public/tailr.svg"
-							alt=""
-							className="w-auto rounded-full bg-white"
+							src={user.imageUrl}
+							alt="Profile"
+							className="w-32 h-32 rounded-2xl border-4 border-white shadow-md object-cover"
 						/>
 					</div>
-				</div>
-				<div className="h-full p-2 py-9 w-4/6 flex shadow-lg gap-2 ">
-					<div className="w-1/2 p-2">
-						<span className="font-bold text-sm">Bio</span>
-						<div className="">
-							<div className="flex flex-col border-b-1 border-dashed p-2">
-								<span className="text-sm text-gray-500">Firstname</span>
-								<span className="text-gray-800 font-bold">
-									<input
-										name="firstname"
-										value={profileInfo.firstname}
-										type="text"
-										onChange={handleChange}
-										readOnly={readOnly}
-										className={`${
-											readOnly ? "outline-none" : "outline"
-										} w-full`}
-									/>
-								</span>
+
+					<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+						<div>
+							<h1 className="text-3xl font-bold text-gray-900">
+								{user.fullName || "User Profile"}
+							</h1>
+							<p className="text-gray-500 font-medium">
+								{user.primaryEmailAddress?.emailAddress}
+							</p>
+						</div>
+
+						{/* <button className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-semibold text-sm">
+							Manage Account
+						</button> */}
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+						{/* Account Details Card */}
+						<div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
+							<h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+								Personal Information
+							</h3>
+							<div className="space-y-4">
+								<div>
+									<label className="text-xs text-gray-500">First Name</label>
+									<p className="text-gray-800 font-medium">{user.firstName}</p>
+								</div>
+								<div>
+									<label className="text-xs text-gray-500">Last Name</label>
+									<p className="text-gray-800 font-medium">{user.lastName}</p>
+								</div>
 							</div>
-							<div className="flex flex-col p-2 border-b-1 border-dashed">
-								<span className="text-sm text-gray-500">Lastname</span>
-								<span className="text-gray-800 font-bold">
-									<input
-										type="text"
-										name="lastname"
-										onChange={handleChange}
-										readOnly={readOnly}
-										value={profileInfo.lastname}
-										className={`${
-											readOnly ? "outline-none" : "outline"
-										} w-full`}
-									/>
-								</span>
-							</div>
-							<div className="flex flex-col p-2 border-b-1 border-dashed">
-								<span className="text-sm text-gray-500">Email</span>
-								<span className="text-gray-800 font-bold">
-									<input
-										type="text"
-										name="email"
-										onChange={handleChange}
-										readOnly={readOnly}
-										value={profileInfo.email}
-										className={`${
-											readOnly ? "outline-none" : "outline"
-										} w-full`}
-									/>
-								</span>
+						</div>
+
+						{/* Session Info Card */}
+						<div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
+							<h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+								Account Security
+							</h3>
+							<div className="space-y-4">
+								<div>
+									<label className="text-xs text-gray-500">Member Since</label>
+									<p className="text-gray-800 font-medium">
+										{user.createdAt
+											? new Date(user.createdAt).toLocaleDateString()
+											: "N/A"}
+									</p>
+								</div>
+								<div>
+									<label className="text-xs text-gray-500">Last Active</label>
+									<p className="text-gray-800 font-medium">
+										{user.lastSignInAt
+											? new Date(user.lastSignInAt).toLocaleTimeString()
+											: "Just now"}
+									</p>
+								</div>
 							</div>
 						</div>
 					</div>
-					<div className="w-1/2 p-2">
-						<span className="font-bold text-sm ">Other account details</span>
-						<div className="flex flex-col gap-2 items-center mt-[20%]">
-							<FileText
-								size={90}
-								strokeWidth={2}
-								className="text-3xl text-blue-900 "
-							/>
-							<span className="font-bold">Total applications created</span>
-							<span className="font-bold text-3xl">1000</span>
-						</div>
-					</div>
 				</div>
-			</div>
-			<div className="flex flex-row-reverse gap-5  w-auto">
-				<button
-					onClick={handleEdit}
-					className={`
-        animate-bounce
-        text-[#090909]
-        py-2 px-4
-        text-lg
-        rounded-lg
-        bg-[#e8e8e8]
-        cursor-pointer\
-        border-b-2
-        border-blue-900
-         border-[#e8e8e8]
-        transition-all duration-300
-        shadow-[6px_6px_12px_#c5c5c5,-6px_-6px_12px_#ffffff]
-        hover:border-white
-        active:shadow-[4px_4px_12px_#c5c5c5,-4px_-4px_12px_#ffffff]
-      `}
-				>
-					Edit
-				</button>
-				<button
-					onClick={handleSave}
-					className={`
-            animate-bounce
-            border-b-2
-            border-blue-900
-        text-[#090909]
-        py-2 px-4
-        text-lg
-        rounded-lg
-        bg-[#e8e8e8]
-        cursor-pointer
-         border-[#e8e8e8]
-        transition-all duration-300
-        shadow-[6px_6px_12px_#c5c5c5,-6px_-6px_12px_#ffffff]
-        hover:border-white
-        active:shadow-[4px_4px_12px_#c5c5c5,-4px_-4px_12px_#ffffff]
-      `}
-				>
-					Save
-				</button>
 			</div>
 		</div>
 	);
