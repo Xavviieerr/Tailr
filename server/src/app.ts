@@ -6,6 +6,7 @@ import aiRoutes from "./modules/ai/aiRoutes";
 import userRoutes from "./modules/user/userRoute";
 import { devAuth } from "./middleware/devAuth";
 import { clerkMiddleware } from "@clerk/express";
+import { globalRateLimiter } from "./middleware/globalRateLimiter";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ if (process.env.NODE_ENV === "development") {
 	app.use(clerkMiddleware());
 }
 
+app.use(globalRateLimiter);
 //routes
 app.use("/api/cvs", cvRoutes);
 app.use("/api/ai", aiRoutes);

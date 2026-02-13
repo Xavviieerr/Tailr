@@ -1,133 +1,278 @@
-// CVTemplate.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-interface CVDta {
-  name: string;
-  title: string; // The main professional title (e.g., Senior Node.js Developer)
-  summary: string; // The introductory paragraph, tailored to the job description
+// interface CVDta {
+// 	name: string;
+// 	title: string;
+//   summary: string;
 
-  // --- Core Header Information ---
-  contact: {
-    email: string;
-    phone?: string; // Made optional, as it's not always required
-    location: string;
-    linkedinUrl?: string; // Added: Essential for professional networking
-    githubUrl?: string; // Added: Crucial for showcasing technical work
-  };
+// 	contact: {
+// 		email: string;
+// 		phone?: string;
+// 		location: string;
+// 		linkedinUrl?: string;
+// 		githubUrl?: string;
+// 	};
 
-  // --- Work Experience Section ---
-  experience: {
-    role: string;
-    company: string;
-    duration: string; // e.g., "Jan 2021 - Present"
-    achievements: string[]; // Corrected: Renamed from 'details' for better semantics
-  }[]; // This array structure ensures scalability for multiple jobs
+// 	experience: {
+// 		role: string;
+// 		company: string;
+// 		duration: string;
+// 		achievements: string[];
+// 	}[];
 
-  // --- Education Section ---
-  education: {
-    school: string;
-    degree: string;
-    durationOrYear: string; // Corrected: Renamed from 'year' for flexibility
-  }[]; // This array structure ensures scalability for multiple degrees/certs
+// 	education: {
+// 		school: string;
+// 		degree: string;
+// 		durationOrYear: string;
+// 	}[];
 
-  // --- Skills and Additional Sections ---
-  skills: string[]; // Simple array of keywords/tools (e.g., ["TypeScript", "Kafka", "AWS"])
-  awardsAndCertifications?: string[]; // Added: An optional section for quick reference
-}
+// 	skills: string[];
+// 	awardsAndCertifications?: string[];
+// }
 interface CVData {
-  name: string;
-  title: string;
-  summary: string;
-  contact: {
-    email: string;
-    phone: string;
-    location: string;
-  };
-  skills: string[];
-  experience: {
-    role: string;
-    company: string;
-    duration: string;
-    details: string[];
-  }[];
-  education: {
-    school: string;
-    degree: string;
-    year: string;
-  }[];
+	name: string;
+	title: string;
+	summary: string;
+	contact: {
+		email: string;
+		phone: string;
+		location: string;
+	};
+	skills: string[];
+	experience: {
+		role: string;
+		company: string;
+		duration: string;
+		details: string[];
+	}[];
+	education: {
+		school: string;
+		degree: string;
+		year: string;
+	}[];
 }
 
 interface CVTemplateProps {
-  data: CVData;
+	data: CVData;
+	editable?: boolean;
+	onChange?: (updated: CVData) => void;
 }
 
-const CVTemplate: React.FC<CVTemplateProps> = ({ data }) => {
-  return (
-    <div id="cv-template" className="max-w-3xl mx-auto bg-white rounded-lg p-8">
-      {/* Header */}
-      <header className="border-b border-gray-300 pb-4 mb-4">
-        <h1 className="text-3xl font-bold text-gray-800">{data.name}</h1>
-        <h2 className="text-lg text-blue-600 font-medium">{data.title}</h2>
-        <p className="text-sm text-gray-500 mt-2">
-          {data.contact.email} | {data.contact.phone} | {data.contact.location}
-        </p>
-      </header>
+const CVTemplate: React.FC<CVTemplateProps> = ({
+	data,
+	editable = true,
+	onChange,
+}) => {
+	const [cv, setCv] = useState<CVData>(data);
 
-      {/* Summary */}
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
-          Profile Summary
-        </h3>
-        <p className="text-gray-600 leading-relaxed">{data.summary}</p>
-      </section>
+	useEffect(() => setCv(data), [data]);
 
-      {/* Skills */}
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">Skills</h3>
-        <ul className="flex flex-wrap gap-2">
-          {data.skills.map((skill, idx) => (
-            <li
-              key={idx}
-              className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-            >
-              {skill}
-            </li>
-          ))}
-        </ul>
-      </section>
+	useEffect(() => {
+		if (onChange) onChange(cv);
+	}, [cv, onChange]);
 
-      {/* Experience */}
-      <section className="mb-6">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">Experience</h3>
-        {data.experience.map((exp, idx) => (
-          <div key={idx} className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
-            <p className="text-sm text-gray-500">
-              {exp.company} • {exp.duration}
-            </p>
-            <ul className="list-disc list-inside text-gray-600 mt-2">
-              {exp.details.map((d, i) => (
-                <li key={i}>{d}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+	const handleInput = (e: React.FormEvent<HTMLElement>) => {
+		const target = e.currentTarget as HTMLElement;
+		const path = target.getAttribute("data-path");
+		if (!path) return;
+		const text = target.textContent ?? "";
 
-      {/* Education */}
-      <section>
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">Education</h3>
-        {data.education.map((edu, idx) => (
-          <div key={idx} className="mb-2">
-            <p className="font-medium text-gray-800">{edu.school}</p>
-            <p className="text-sm text-gray-500">
-              {edu.degree} • {edu.year}
-            </p>
-          </div>
-        ))}
-      </section>
-    </div>
-  );
+		setCv((prev) => {
+			const next: any = JSON.parse(JSON.stringify(prev));
+			const parts = path.split(".");
+			let cur: any = next;
+			for (let i = 0; i < parts.length - 1; i++) {
+				const p = parts[i];
+				const key = Number.isFinite(Number(p)) ? Number(p) : p;
+				if (cur[key] === undefined) cur[key] = {};
+				cur = cur[key];
+			}
+			const last = parts[parts.length - 1];
+			const lastKey = Number.isFinite(Number(last)) ? Number(last) : last;
+			cur[lastKey] = text;
+			return next;
+		});
+	};
+
+	return (
+		<div id="cv-template" className="max-w-3xl mx-auto bg-white rounded-lg p-8">
+			{/* Header */}
+			<header className="border-b border-gray-300 pb-4 mb-4">
+				<h1
+					className="text-3xl font-bold text-gray-800"
+					contentEditable={editable}
+					suppressContentEditableWarning
+					data-path="name"
+					onInput={handleInput}
+				>
+					{cv.name}
+				</h1>
+				<h2
+					className="text-lg text-blue-600 font-medium"
+					contentEditable={editable}
+					suppressContentEditableWarning
+					data-path="title"
+					onInput={handleInput}
+				>
+					{cv.title}
+				</h2>
+				<p className="text-sm text-gray-500 mt-2">
+					<span
+						contentEditable={editable}
+						suppressContentEditableWarning
+						data-path="contact.email"
+						onInput={handleInput}
+					>
+						{cv.contact.email}
+					</span>{" "}
+					|{" "}
+					<span
+						contentEditable={editable}
+						suppressContentEditableWarning
+						data-path="contact.phone"
+						onInput={handleInput}
+					>
+						{cv.contact.phone}
+					</span>{" "}
+					|{" "}
+					<span
+						contentEditable={editable}
+						suppressContentEditableWarning
+						data-path="contact.location"
+						onInput={handleInput}
+					>
+						{cv.contact.location}
+					</span>
+				</p>
+			</header>
+
+			{/* Summary */}
+			<section className="mb-6">
+				<h3 className="text-xl font-semibold text-gray-700 mb-2">
+					Profile Summary
+				</h3>
+				<p
+					className="text-gray-600 leading-relaxed"
+					contentEditable={editable}
+					suppressContentEditableWarning
+					data-path="summary"
+					onInput={handleInput}
+				>
+					{cv.summary}
+				</p>
+			</section>
+
+			{/* Skills */}
+			<section className="mb-6">
+				<h3 className="text-xl font-semibold text-gray-700 mb-2">Skills</h3>
+				<ul className="flex flex-wrap gap-2">
+					{cv.skills.map((skill, idx) => (
+						<li
+							key={idx}
+							className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+							contentEditable={editable}
+							suppressContentEditableWarning
+							data-path={`skills.${idx}`}
+							onInput={handleInput}
+						>
+							{skill}
+						</li>
+					))}
+				</ul>
+			</section>
+
+			{/* Experience */}
+			<section className="mb-6">
+				<h3 className="text-xl font-semibold text-gray-700 mb-2">Experience</h3>
+				{cv.experience.map((exp, idx) => (
+					<div key={idx} className="mb-4">
+						<h4
+							className="text-lg font-semibold text-gray-800"
+							contentEditable={editable}
+							suppressContentEditableWarning
+							data-path={`experience.${idx}.role`}
+							onInput={handleInput}
+						>
+							{exp.role}
+						</h4>
+						<p className="text-sm text-gray-500">
+							<span
+								contentEditable={editable}
+								suppressContentEditableWarning
+								data-path={`experience.${idx}.company`}
+								onInput={handleInput}
+							>
+								{exp.company}
+							</span>{" "}
+							•{" "}
+							<span
+								contentEditable={editable}
+								suppressContentEditableWarning
+								data-path={`experience.${idx}.duration`}
+								onInput={handleInput}
+							>
+								{exp.duration}
+							</span>
+						</p>
+						<ul className="list-disc list-inside text-gray-600 mt-2">
+							{exp.details.map((d, i) => (
+								<li
+									key={i}
+									contentEditable={editable}
+									suppressContentEditableWarning
+									data-path={`experience.${idx}.details.${i}`}
+									onInput={handleInput}
+								>
+									{d}
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</section>
+
+			{/* Education */}
+			<section>
+				<h3 className="text-xl font-semibold text-gray-700 mb-2 flex flex-wrap gap-2">
+					Education
+				</h3>
+				<div className="flex flex-wrap gap-5">
+					{cv.education.map((edu, idx) => (
+						<div key={idx} className="mb-2">
+							<p
+								className="font-medium text-gray-800"
+								contentEditable={editable}
+								suppressContentEditableWarning
+								data-path={`education.${idx}.school`}
+								onInput={handleInput}
+							>
+								{edu.school}
+							</p>
+							<p className="text-sm text-gray-500">
+								<span
+									contentEditable={editable}
+									suppressContentEditableWarning
+									data-path={`education.${idx}.degree`}
+									onInput={handleInput}
+								>
+									{edu.degree}
+								</span>{" "}
+								•{" "}
+								<span
+									contentEditable={editable}
+									suppressContentEditableWarning
+									data-path={`education.${idx}.year`}
+									onInput={handleInput}
+								>
+									{edu.year}
+								</span>
+							</p>
+						</div>
+					))}
+				</div>
+			</section>
+		</div>
+	);
 };
 
 export default CVTemplate;
