@@ -11,19 +11,19 @@ export const AuthSyncManager: React.FC<{ children: React.ReactNode }> = ({
 	const { isLoaded, isSignedIn, user } = useUser();
 	const { getToken } = useAuth();
 	const dispatch = useDispatch<AppDispatch>();
-	const { data, loading } = useSelector((state: RootState) => state.user);
+	const { loading } = useSelector((state: RootState) => state.user);
 
 	useEffect(() => {
 		const performSync = async () => {
-			if (isLoaded && isSignedIn && user && !data && !loading) {
+			if (isLoaded && isSignedIn && user) {
 				const token = await getToken();
 				if (token) {
 					dispatch(
 						syncUserWithBackend({
 							token,
 							profile: {
-								firstname: user.firstName || "",
-								lastname: user.lastName || "",
+								firstName: user.firstName || "",
+								lastName: user.lastName || "",
 								email: user.emailAddresses[0].emailAddress,
 							},
 						}),
@@ -33,7 +33,7 @@ export const AuthSyncManager: React.FC<{ children: React.ReactNode }> = ({
 		};
 
 		performSync();
-	}, [isLoaded, isSignedIn, user, dispatch, getToken, data, loading]);
+	}, [isLoaded, isSignedIn, user, dispatch, getToken]);
 
 	if (!isLoaded || loading) {
 		return <Loader />;

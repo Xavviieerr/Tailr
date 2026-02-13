@@ -1,36 +1,24 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { UserProfile, UserState } from "../types/user";
+import { apiClient } from "../api/client";
 
-// The Async Action: Talks to your Backend
 export const syncUserWithBackend = createAsyncThunk(
 	"user/sync",
 	async (
 		{ profile, token }: { profile: UserProfile; token: string },
 		thunkAPI,
 	) => {
-		// try {
-		// 	// const response = await fetch("https://your-api.com/v1/users", {
-		// 	// 	method: "POST",
-		// 	// 	headers: {
-		// 	// 		"Content-Type": "application/json",
-		// 	// 		Authorization: `Bearer ${token}`,
-		// 	// 	},
-		// 	// 	body: JSON.stringify(profile),
-		// 	// });
-
-		// 	// if (!response.ok) throw new Error("Failed to sync user");
-		// 	// return await response.json();
-
-		// } catch (error: any) {
-		// 	return thunkAPI.rejectWithValue(error.message);
-		// }
-		console.log(
-			"Simulating backend sync with profile:",
-			profile,
-			"and token:",
-			token,
-		);
-		return profile;
+		try {
+			return await apiClient("/api/user/newUser", {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(profile),
+			});
+		} catch (error: any) {
+			return thunkAPI.rejectWithValue(error.message);
+		}
 	},
 );
 

@@ -1,7 +1,6 @@
 import React from "react";
 import JobInfoForm from "../components/JobInfoForm";
 import CVtemplate from "../assets/template/CVtemplate";
-import { useAuth } from "@clerk/clerk-react";
 
 const sampleData = {
 	name: "Chidera Ogbu",
@@ -50,10 +49,6 @@ const sampleData = {
 };
 
 const DashboardHome = () => {
-	const { getToken, isSignedIn } = useAuth();
-
-	const token = getToken();
-	console.log(token);
 	const handlePrint = () => {
 		window.print();
 	};
