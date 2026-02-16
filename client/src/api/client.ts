@@ -6,8 +6,9 @@ export const apiClient = async (
 ) => {
 	const url = `${BASE_URL}${endpoint}`;
 
+	const isFormData = options.body instanceof FormData;
 	const headers = {
-		"Content-Type": "application/json",
+		...(isFormData ? {} : { "Content-Type": "application/json" }),
 		...options.headers,
 	};
 	const response = await fetch(url, { ...options, headers });
