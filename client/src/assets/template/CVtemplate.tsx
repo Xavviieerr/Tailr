@@ -1,95 +1,35 @@
 import React, { useEffect, useState } from "react";
-
-// interface CVDta {
-// 	name: string;
-// 	title: string;
-//   summary: string;
-
-// 	contact: {
-// 		email: string;
-// 		phone?: string;
-// 		location: string;
-// 		linkedinUrl?: string;
-// 		githubUrl?: string;
-// 	};
-
-// 	experience: {
-// 		role: string;
-// 		company: string;
-// 		duration: string;
-// 		achievements: string[];
-// 	}[];
-
-// 	education: {
-// 		school: string;
-// 		degree: string;
-// 		durationOrYear: string;
-// 	}[];
-
-// 	skills: string[];
-// 	awardsAndCertifications?: string[];
-// }
-interface CVData {
-	name: string;
-	title: string;
-	summary: string;
-	contact: {
-		email: string;
-		phone: string;
-		location: string;
-	};
-	skills: string[];
-	experience: {
-		role: string;
-		company: string;
-		duration: string;
-		details: string[];
-	}[];
-	education: {
-		school: string;
-		degree: string;
-		year: string;
-	}[];
-}
-
-interface CVTemplateProps {
-	data: CVData;
-	editable?: boolean;
-	onChange?: (updated: CVData) => void;
-}
+import { transformRawToCVData } from "../../utils/cvTransformer";
+import type { CVData, CVTemplateProps } from "../../types/cv";
 
 const CVTemplate: React.FC<CVTemplateProps> = ({
 	data,
 	editable = true,
 	onChange,
 }) => {
-	const [cv, setCv] = useState<CVData>(data);
-
-	useEffect(() => setCv(data), [data]);
+	const [cv, setCv] = useState<CVData>(() => transformRawToCVData(data));
 
 	useEffect(() => {
-		if (onChange) onChange(cv);
-	}, [cv, onChange]);
+		setCv(transformRawToCVData(data));
+	}, [data]);
 
 	const handleInput = (e: React.FormEvent<HTMLElement>) => {
-		const target = e.currentTarget as HTMLElement;
+		const target = e.currentTarget;
 		const path = target.getAttribute("data-path");
 		if (!path) return;
-		const text = target.textContent ?? "";
+
+		const value = target.textContent ?? "";
 
 		setCv((prev) => {
-			const next: any = JSON.parse(JSON.stringify(prev));
+			const next = { ...prev };
 			const parts = path.split(".");
-			let cur: any = next;
+
+			let current: any = next;
 			for (let i = 0; i < parts.length - 1; i++) {
-				const p = parts[i];
-				const key = Number.isFinite(Number(p)) ? Number(p) : p;
-				if (cur[key] === undefined) cur[key] = {};
-				cur = cur[key];
+				current = current[parts[i]];
 			}
-			const last = parts[parts.length - 1];
-			const lastKey = Number.isFinite(Number(last)) ? Number(last) : last;
-			cur[lastKey] = text;
+			current[parts[parts.length - 1]] = value;
+
 			return next;
 		});
 	};

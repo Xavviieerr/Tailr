@@ -1,54 +1,12 @@
 import React from "react";
 import JobInfoForm from "../components/JobInfoForm";
 import CVtemplate from "../assets/template/CVtemplate";
-
-const sampleData = {
-	name: "Chidera Ogbu",
-	title: "Frontend Developer",
-	summary:
-		"Creative and detail-oriented developer skilled in building scalable web applications using React, TypeScript, and Tailwind CSS.",
-	contact: {
-		email: "chidera@example.com",
-		phone: "+234 812 345 6789",
-		location: "Lagos, Nigeria",
-	},
-	skills: ["React", "TypeScript", "Tailwind CSS", "Node.js", "PostgreSQL"],
-	experience: [
-		{
-			role: "Frontend Engineer",
-			company: "Techify Ltd.",
-			duration: "2022 - Present",
-			details: [
-				"Built and optimized responsive dashboards using React and Tailwind.",
-				"Collaborated with designers to improve UI/UX across 5 products.",
-			],
-		},
-	],
-	education: [
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-	],
-};
+import { useSelector } from "react-redux";
+import type { RootState } from "../store";
 
 const DashboardHome = () => {
+	const { cv } = useSelector((state: RootState) => state.cv);
+	console.log("CV in DashboardHome:", cv?.cv);
 	const handlePrint = () => {
 		window.print();
 	};
@@ -89,7 +47,7 @@ const DashboardHome = () => {
 						Save
 					</button>
 				</div>
-				<CVtemplate data={sampleData} />
+				<CVtemplate data={cv?.cv as any} />
 			</div>
 		</div>
 	);
