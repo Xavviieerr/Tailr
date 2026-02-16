@@ -34,7 +34,6 @@ const JobInfoForm: React.FC = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		console.log(jobInfo);
 
 		const token = await getToken();
 		if (!token) return;
@@ -47,10 +46,9 @@ const JobInfoForm: React.FC = () => {
 		if (jobInfo.file) form.append("previousCv", jobInfo.file as File);
 
 		dispatch(generateCV({ token, jobInfo: form }));
-		if (loading) return <Loader />;
-		if (error) return <div className="text-red-500">Error: {error}</div>;
 	};
-
+	if (loading) return <Loader />;
+	if (error) return <div className="text-red-500">Error: {error}</div>;
 	return (
 		<form
 			onSubmit={handleSubmit}
