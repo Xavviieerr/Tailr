@@ -1,37 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { transformRawToCVData } from "../../utils/cvTransformer";
-import type { CVData, CVTemplateProps } from "../../types/cv";
+import { transformRawToSections } from "../../utils/cvTransformer";
 
-const CVTemplate: React.FC<CVTemplateProps> = ({
-	data,
-	editable = true,
-	onChange,
-}) => {
-	const [cv, setCv] = useState<CVData>(() => transformRawToCVData(data));
+const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
+	const [sections, setSections] = useState<any[]>([]);
 
 	useEffect(() => {
-		setCv(transformRawToCVData(data));
+		setSections(transformRawToSections(data));
 	}, [data]);
 
-	const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
-		const target = e.currentTarget;
-		const path = target.getAttribute("data-path");
-		if (!path) return;
+	const handleBlur = (
+		e: React.FocusEvent<HTMLElement>,
+		sectionIndex: number,
+		path: string,
+	) => {
+		const value = e.currentTarget.textContent ?? "";
 
-		const value = target.textContent ?? "";
-
-		setCv((prev) => {
+		setSections((prev) => {
 			const next = JSON.parse(JSON.stringify(prev));
-			const parts = path.split(".");
 
-			let current: any = next;
-			for (let i = 0; i < parts.length - 1; i++) {
-				current = current[parts[i]];
+			const keys = path.split(".");
+			let current = next[sectionIndex].data;
+
+			for (let i = 0; i < keys.length - 1; i++) {
+				current = current[keys[i]];
 			}
 
-			if (current[parts[parts.length - 1]] === value) return prev;
-
-			current[parts[parts.length - 1]] = value;
+			current[keys[keys.length - 1]] = value;
 
 			if (onChange) onChange(next);
 
@@ -40,194 +34,124 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
 	};
 
 	return (
-		<div
-			id="cv-template"
-			className="max-w-3xl mx-auto bg-white rounded-lg p-10 shadow-lg my-10"
-		>
-			{/* Header / Contact Section */}
-			<header className="border-b-2 border-gray-100 pb-6 mb-6">
-				<h1
-					className="text-4xl font-extrabold text-gray-900 outline-none focus:bg-blue-50 rounded px-1 transition-colors"
-					contentEditable={editable}
-					suppressContentEditableWarning
-					data-path="name"
-					onBlur={handleBlur}
-				>
-					{cv.name}
-				</h1>
-				<h2
-					className="text-xl text-blue-600 font-semibold mt-1 outline-none focus:bg-blue-50 rounded px-1"
-					contentEditable={editable}
-					suppressContentEditableWarning
-					data-path="title"
-					onBlur={handleBlur}
-				>
-					{cv.title}
-				</h2>
-
-				<div className="flex flex-wrap gap-3 text-sm text-gray-600 mt-4 font-medium">
-					<span
-						className="outline-none focus:underline"
-						contentEditable={editable}
-						suppressContentEditableWarning
-						data-path="contact.email"
-						onBlur={handleBlur}
-					>
-						{cv.contact.email}
-					</span>
-					<span className="text-gray-300">|</span>
-					<span
-						className="outline-none focus:underline"
-						contentEditable={editable}
-						suppressContentEditableWarning
-						data-path="contact.phone"
-						onBlur={handleBlur}
-					>
-						{cv.contact.phone}
-					</span>
-					<span className="text-gray-300">|</span>
-					<span
-						className="outline-none focus:underline"
-						contentEditable={editable}
-						suppressContentEditableWarning
-						data-path="contact.location"
-						onBlur={handleBlur}
-					>
-						{cv.contact.location}
-					</span>
-				</div>
-			</header>
-
-			{/* Summary Section */}
-			<section className="mb-8">
-				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
-					Professional Profile
-				</h3>
-				<p
-					className="text-gray-700 leading-relaxed outline-none focus:bg-blue-50 rounded p-1"
-					contentEditable={editable}
-					suppressContentEditableWarning
-					data-path="summary"
-					onBlur={handleBlur}
-				>
-					{cv.summary}
-				</p>
-			</section>
-
-			{/* Skills Section */}
-			<section className="mb-8">
-				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
-					Core Competencies
-				</h3>
-				<div className="flex flex-wrap gap-2">
-					{cv.skills.map((skill, idx) => (
-						<span
-							key={idx}
-							className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold border border-gray-200 outline-none focus:ring-2 focus:ring-blue-300"
-							contentEditable={editable}
-							suppressContentEditableWarning
-							data-path={`skills.${idx}`}
-							onBlur={handleBlur}
-						>
-							{skill}
-						</span>
-					))}
-				</div>
-			</section>
-
-			{/* Experience Section */}
-			<section className="mb-8">
-				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
-					Work History
-				</h3>
-				{cv.experience.map((exp, idx) => (
-					<div key={idx} className="mb-6 group">
-						<div className="flex justify-between items-baseline">
-							<h4
-								className="text-lg font-bold text-gray-800 outline-none"
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`experience.${idx}.role`}
-								onBlur={handleBlur}
-							>
-								{exp.role}
-							</h4>
-							<span
-								className="text-sm text-gray-500 font-mono outline-none"
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`experience.${idx}.duration`}
-								onBlur={handleBlur}
-							>
-								{exp.duration}
-							</span>
-						</div>
-						<p
-							className="text-blue-700 font-medium mb-2 outline-none"
-							contentEditable={editable}
-							suppressContentEditableWarning
-							data-path={`experience.${idx}.company`}
-							onBlur={handleBlur}
-						>
-							{exp.company}
-						</p>
-						<ul className="list-disc list-outside ml-5 text-gray-600 space-y-1">
-							{exp.details.map((detail, i) => (
-								<li
-									key={i}
-									className="outline-none focus:bg-blue-50 rounded px-1"
+		<div className="max-w-3xl mx-auto bg-white p-10 shadow-lg my-10">
+			{sections.map((section, sIndex) => {
+				switch (section.type) {
+					case "header":
+						return (
+							<div key={sIndex} className="mb-8 border-b pb-6">
+								<h1
 									contentEditable={editable}
 									suppressContentEditableWarning
-									data-path={`experience.${idx}.details.${i}`}
-									onBlur={handleBlur}
+									onBlur={(e) => handleBlur(e, sIndex, "name")}
+									className="text-3xl font-bold"
 								>
-									{detail}
-								</li>
-							))}
-						</ul>
-					</div>
-				))}
-			</section>
+									{section.data.name}
+								</h1>
 
-			{/* Education Section */}
-			<section>
-				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
-					Academic Background
-				</h3>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-					{cv.education.map((edu, idx) => (
-						<div key={idx} className="border-l-2 border-gray-100 pl-4">
-							<p
-								className="font-bold text-gray-800 outline-none"
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`education.${idx}.school`}
-								onBlur={handleBlur}
-							>
-								{edu.school}
-							</p>
-							<p
-								className="text-sm text-gray-600 outline-none"
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`education.${idx}.degree`}
-								onBlur={handleBlur}
-							>
-								{edu.degree}
-							</p>
-							<p
-								className="text-xs text-gray-400 mt-1 outline-none"
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`education.${idx}.year`}
-								onBlur={handleBlur}
-							>
-								{edu.year}
-							</p>
-						</div>
-					))}
-				</div>
-			</section>
+								<p
+									contentEditable={editable}
+									suppressContentEditableWarning
+									onBlur={(e) => handleBlur(e, sIndex, "title")}
+								>
+									{section.data.title}
+								</p>
+
+								<p>
+									{section.data.email} | {section.data.phone} |{" "}
+									{section.data.location}
+									{section.data.linkedin && ` | ${section.data.linkedin}`}
+								</p>
+							</div>
+						);
+
+					case "summary":
+						return (
+							<div key={sIndex} className="mb-6 border-b">
+								<h3>{section.title}</h3>
+								<p
+									contentEditable={editable}
+									suppressContentEditableWarning
+									onBlur={(e) => handleBlur(e, sIndex, "")}
+								>
+									{section.data}
+								</p>
+							</div>
+						);
+
+					case "skills":
+						return (
+							<div key={sIndex} className="mb-6 border-b">
+								<h3>{section.title}</h3>
+								<ul>
+									{section.data.items.map((skill: string, i: number) => (
+										<li
+											key={i}
+											contentEditable={editable}
+											suppressContentEditableWarning
+											onBlur={(e) => handleBlur(e, sIndex, `items.${i}`)}
+										>
+											{skill}
+										</li>
+									))}
+								</ul>
+							</div>
+						);
+
+					case "experience":
+						return (
+							<div key={sIndex} className="mb-6 broder-b">
+								<h3>{section.title}</h3>
+
+								{section.data.items.map((exp: any, i: number) => (
+									<div key={i}>
+										<strong>{exp.role}</strong> <span>{exp.duration}</span>
+										<p>{exp.company}</p>
+										<ul>
+											{exp.details?.map((d: string, j: number) => (
+												<li key={j}>{d}</li>
+											))}
+										</ul>
+									</div>
+								))}
+							</div>
+						);
+					case "education":
+					case "portfolio":
+					case "projects":
+					case "skills":
+						return (
+							<div key={sIndex} className="mb-6">
+								<h3 className="text-xl font-semibold border-b mb-2">
+									{section.title}
+								</h3>
+								<ul className="list-disc ml-5">
+									{section.data.items.map((item: any, i: number) => (
+										<li
+											key={i}
+											contentEditable={editable}
+											suppressContentEditableWarning
+											onBlur={(e) => handleBlur(e, sIndex, `items.${i}`)}
+											className="mb-1"
+										>
+											{/* If item is an object (like portfolio links), handle accordingly */}
+											{typeof item === "string" ? item : JSON.stringify(item)}
+										</li>
+									))}
+								</ul>
+							</div>
+						);
+
+					default:
+						// fallback renderer for any unknown section
+						return (
+							<div key={sIndex} className="mb-6">
+								<h3>{section.title}</h3>
+								<pre>{JSON.stringify(section.data, null, 2)}</pre>
+							</div>
+						);
+				}
+			})}
 		</div>
 	);
 };

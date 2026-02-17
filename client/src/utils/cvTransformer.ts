@@ -1,47 +1,97 @@
-import type { CVData, RawCVResponse } from "../types/cv";
+import type { RawCVResponse } from "../types/cv";
 
-export const transformRawToCVData = (raw: RawCVResponse | any): CVData => {
+export const transformRawToSections = (raw: RawCVResponse | any) => {
 	const sections = Array.isArray(raw?.sections) ? raw.sections : [];
-	const findSection = (type: string) =>
-		sections.find((s: any) => s?.type === type);
 
-	const safeParse = (jsonString: any, fallback: any) => {
+	const safeParse = (value: any) => {
 		try {
-			return typeof jsonString === "string"
-				? JSON.parse(jsonString)
-				: jsonString;
-		} catch (e) {
-			console.error("Failed to parse section data", e);
-			return fallback;
+			return typeof value === "string" ? JSON.parse(value) : value;
+		} catch {
+			return value;
 		}
 	};
 
-	const header = findSection("header")?.data || {};
-	const contact = safeParse(header.contact, {});
-	const skillsData = safeParse(findSection("skills")?.data, { items: [] });
-	const expData = safeParse(findSection("experience")?.data, { items: [] });
-	const eduData = safeParse(findSection("education")?.data, { items: [] });
+	return sections.map((section: any) => {
+		const parsedData = safeParse(section?.data);
 
-	return {
-		name: header?.name || "Untitled",
-		title: header?.title || "",
-		summary: findSection("summary")?.data || "",
-		contact: {
-			email: contact?.email || "",
-			phone: contact?.phone || "",
-			location: contact?.location || "",
-		},
-		skills: skillsData?.items || [],
-		experience: (expData?.items || []).map((item: any) => ({
-			role: item.role || "",
-			company: item.company || "",
-			duration: item.duration || "",
-			details: item.achievements || [],
-		})),
-		education: (eduData?.items || []).map((item: any) => ({
-			school: item.school || "",
-			degree: item.degree || "",
-			year: item.durationOrYear || "",
-		})),
-	};
+		switch (section?.type) {
+			case "header":
+				return {
+					type: "header",
+					title: section.title,
+					data: {
+						name: parsedData?.name || "",
+						title: parsedData?.title || "",
+						email: parsedData?.email || "",
+						phone: parsedData?.phone || "",
+						location:
+							typeof parsedData?.contact === "string"
+								? parsedData.contact
+								: parsedData?.contact?.location || "",
+						linkedin:
+							parsedData?.linkedinUrl || parsedData?.contact?.linkedin || "",
+					},
+				};
+
+			case "skills":
+				return {
+					type: "skills",
+					title: section.title,
+					data: {
+						items: Array.isArray(parsedData?.items) ? parsedData.items : [],
+					},
+				};
+
+			case "experience":
+				const items = Array.isArray(parsedData?.items) ? parsedData.items : [];
+
+				const normalized =
+					items.length > 0 && typeof items[0] === "string"
+						? [
+								{
+									company: items[0] || "",
+									role: items[1] || "",
+									duration: items[2] || "",
+									details: items.slice(3) || [],
+								},
+							]
+						: items;
+
+				return {
+					type: "experience",
+					title: section.title,
+					data: { items: normalized },
+				};
+
+			case "education":
+				return {
+					type: "education",
+					title: section.title,
+					data: {
+						items: Array.isArray(parsedData?.items) ? parsedData.items : [],
+					},
+				};
+
+			case "education":
+			case "portfolio":
+				return {
+					type: section.type,
+					title: section.title,
+					data: {
+						items: Array.isArray(parsedData?.items)
+							? parsedData.items
+							: typeof parsedData === "string"
+								? [parsedData]
+								: [],
+					},
+				};
+
+			default:
+				return {
+					type: section?.type || "custom",
+					title: section?.title || "",
+					data: parsedData || {},
+				};
+		}
+	});
 };

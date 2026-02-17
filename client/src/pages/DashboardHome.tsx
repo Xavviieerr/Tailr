@@ -10,10 +10,6 @@ const DashboardHome = () => {
 		window.print();
 	};
 
-	const handleRedo = () => {
-		alert("redo");
-	};
-
 	const handleSave = () => {
 		alert("Save");
 	};
@@ -33,12 +29,7 @@ const DashboardHome = () => {
 					>
 						Download CV
 					</button>
-					<button
-						onClick={handleRedo}
-						className=" mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
-					>
-						Redo
-					</button>
+
 					<button
 						onClick={handleSave}
 						className=" mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
@@ -46,7 +37,9 @@ const DashboardHome = () => {
 						Save
 					</button>
 				</div>
-				<CVtemplate data={cv?.cv as any} />
+				<div id="cv-template">
+					<CVtemplate data={cv?.cv as any} />
+				</div>
 			</div>
 		</div>
 	);
