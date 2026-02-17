@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiClient } from "../api/client";
 import type { GenerateCVState, JobInfo } from "../types/cv";
-import type { UserState } from "../types/user";
-import { syncUserWithBackend } from "./userSlice";
 
 export const generateCV = createAsyncThunk(
 	"cv/generate",
@@ -28,9 +26,10 @@ export const generateCV = createAsyncThunk(
 		}
 	},
 );
+const savedCv = localStorage.getItem("generatedCv");
 
 const initialState: GenerateCVState = {
-	cv: null,
+	cv: savedCv ? JSON.parse(savedCv) : null,
 	loading: false,
 	error: null,
 };
@@ -41,6 +40,7 @@ const generateCvSlice = createSlice({
 	reducers: {
 		clearCv: (state) => {
 			state.cv = null;
+			localStorage.removeItem("generatedCv");
 		},
 	},
 	extraReducers: (builder) => {
@@ -50,8 +50,8 @@ const generateCvSlice = createSlice({
 			})
 			.addCase(generateCV.fulfilled, (state, action) => {
 				state.loading = false;
-				console.log("Generated CV:", action.payload);
 				state.cv = action.payload;
+				localStorage.setItem("generatedCv", JSON.stringify(action.payload));
 			})
 			.addCase(generateCV.rejected, (state, action) => {
 				state.loading = false;

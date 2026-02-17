@@ -23,22 +23,22 @@ export const transformRawToCVData = (raw: RawCVResponse | any): CVData => {
 	const eduData = safeParse(findSection("education")?.data, { items: [] });
 
 	return {
-		name: header.name || "Untitled",
-		title: header.title || "",
+		name: header?.name || "Untitled",
+		title: header?.title || "",
 		summary: findSection("summary")?.data || "",
 		contact: {
-			email: contact.email || "",
-			phone: contact.phone || "",
-			location: contact.location || "",
+			email: contact?.email || "",
+			phone: contact?.phone || "",
+			location: contact?.location || "",
 		},
-		skills: skillsData.items || [],
-		experience: (expData.items || []).map((item: any) => ({
+		skills: skillsData?.items || [],
+		experience: (expData?.items || []).map((item: any) => ({
 			role: item.role || "",
 			company: item.company || "",
 			duration: item.duration || "",
 			details: item.achievements || [],
 		})),
-		education: (eduData.items || []).map((item: any) => ({
+		education: (eduData?.items || []).map((item: any) => ({
 			school: item.school || "",
 			degree: item.degree || "",
 			year: item.durationOrYear || "",

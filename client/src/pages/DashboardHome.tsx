@@ -6,7 +6,6 @@ import type { RootState } from "../store";
 
 const DashboardHome = () => {
 	const { cv } = useSelector((state: RootState) => state.cv);
-	console.log("CV in DashboardHome:", cv?.cv);
 	const handlePrint = () => {
 		window.print();
 	};

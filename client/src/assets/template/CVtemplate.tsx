@@ -13,7 +13,7 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
 		setCv(transformRawToCVData(data));
 	}, [data]);
 
-	const handleInput = (e: React.FormEvent<HTMLElement>) => {
+	const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
 		const target = e.currentTarget;
 		const path = target.getAttribute("data-path");
 		if (!path) return;
@@ -21,149 +21,167 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
 		const value = target.textContent ?? "";
 
 		setCv((prev) => {
-			const next = { ...prev };
+			const next = JSON.parse(JSON.stringify(prev));
 			const parts = path.split(".");
 
 			let current: any = next;
 			for (let i = 0; i < parts.length - 1; i++) {
 				current = current[parts[i]];
 			}
+
+			if (current[parts[parts.length - 1]] === value) return prev;
+
 			current[parts[parts.length - 1]] = value;
+
+			if (onChange) onChange(next);
 
 			return next;
 		});
 	};
 
 	return (
-		<div id="cv-template" className="max-w-3xl mx-auto bg-white rounded-lg p-8">
-			{/* Header */}
-			<header className="border-b border-gray-300 pb-4 mb-4">
+		<div
+			id="cv-template"
+			className="max-w-3xl mx-auto bg-white rounded-lg p-10 shadow-lg my-10"
+		>
+			{/* Header / Contact Section */}
+			<header className="border-b-2 border-gray-100 pb-6 mb-6">
 				<h1
-					className="text-3xl font-bold text-gray-800"
+					className="text-4xl font-extrabold text-gray-900 outline-none focus:bg-blue-50 rounded px-1 transition-colors"
 					contentEditable={editable}
 					suppressContentEditableWarning
 					data-path="name"
-					onInput={handleInput}
+					onBlur={handleBlur}
 				>
 					{cv.name}
 				</h1>
 				<h2
-					className="text-lg text-blue-600 font-medium"
+					className="text-xl text-blue-600 font-semibold mt-1 outline-none focus:bg-blue-50 rounded px-1"
 					contentEditable={editable}
 					suppressContentEditableWarning
 					data-path="title"
-					onInput={handleInput}
+					onBlur={handleBlur}
 				>
 					{cv.title}
 				</h2>
-				<p className="text-sm text-gray-500 mt-2">
+
+				<div className="flex flex-wrap gap-3 text-sm text-gray-600 mt-4 font-medium">
 					<span
+						className="outline-none focus:underline"
 						contentEditable={editable}
 						suppressContentEditableWarning
 						data-path="contact.email"
-						onInput={handleInput}
+						onBlur={handleBlur}
 					>
 						{cv.contact.email}
-					</span>{" "}
-					|{" "}
+					</span>
+					<span className="text-gray-300">|</span>
 					<span
+						className="outline-none focus:underline"
 						contentEditable={editable}
 						suppressContentEditableWarning
 						data-path="contact.phone"
-						onInput={handleInput}
+						onBlur={handleBlur}
 					>
 						{cv.contact.phone}
-					</span>{" "}
-					|{" "}
+					</span>
+					<span className="text-gray-300">|</span>
 					<span
+						className="outline-none focus:underline"
 						contentEditable={editable}
 						suppressContentEditableWarning
 						data-path="contact.location"
-						onInput={handleInput}
+						onBlur={handleBlur}
 					>
 						{cv.contact.location}
 					</span>
-				</p>
+				</div>
 			</header>
 
-			{/* Summary */}
-			<section className="mb-6">
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">
-					Profile Summary
+			{/* Summary Section */}
+			<section className="mb-8">
+				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
+					Professional Profile
 				</h3>
 				<p
-					className="text-gray-600 leading-relaxed"
+					className="text-gray-700 leading-relaxed outline-none focus:bg-blue-50 rounded p-1"
 					contentEditable={editable}
 					suppressContentEditableWarning
 					data-path="summary"
-					onInput={handleInput}
+					onBlur={handleBlur}
 				>
 					{cv.summary}
 				</p>
 			</section>
 
-			{/* Skills */}
-			<section className="mb-6">
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">Skills</h3>
-				<ul className="flex flex-wrap gap-2">
+			{/* Skills Section */}
+			<section className="mb-8">
+				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
+					Core Competencies
+				</h3>
+				<div className="flex flex-wrap gap-2">
 					{cv.skills.map((skill, idx) => (
-						<li
+						<span
 							key={idx}
-							className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+							className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-semibold border border-gray-200 outline-none focus:ring-2 focus:ring-blue-300"
 							contentEditable={editable}
 							suppressContentEditableWarning
 							data-path={`skills.${idx}`}
-							onInput={handleInput}
+							onBlur={handleBlur}
 						>
 							{skill}
-						</li>
+						</span>
 					))}
-				</ul>
+				</div>
 			</section>
 
-			{/* Experience */}
-			<section className="mb-6">
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">Experience</h3>
+			{/* Experience Section */}
+			<section className="mb-8">
+				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
+					Work History
+				</h3>
 				{cv.experience.map((exp, idx) => (
-					<div key={idx} className="mb-4">
-						<h4
-							className="text-lg font-semibold text-gray-800"
-							contentEditable={editable}
-							suppressContentEditableWarning
-							data-path={`experience.${idx}.role`}
-							onInput={handleInput}
-						>
-							{exp.role}
-						</h4>
-						<p className="text-sm text-gray-500">
-							<span
+					<div key={idx} className="mb-6 group">
+						<div className="flex justify-between items-baseline">
+							<h4
+								className="text-lg font-bold text-gray-800 outline-none"
 								contentEditable={editable}
 								suppressContentEditableWarning
-								data-path={`experience.${idx}.company`}
-								onInput={handleInput}
+								data-path={`experience.${idx}.role`}
+								onBlur={handleBlur}
 							>
-								{exp.company}
-							</span>{" "}
-							•{" "}
+								{exp.role}
+							</h4>
 							<span
+								className="text-sm text-gray-500 font-mono outline-none"
 								contentEditable={editable}
 								suppressContentEditableWarning
 								data-path={`experience.${idx}.duration`}
-								onInput={handleInput}
+								onBlur={handleBlur}
 							>
 								{exp.duration}
 							</span>
+						</div>
+						<p
+							className="text-blue-700 font-medium mb-2 outline-none"
+							contentEditable={editable}
+							suppressContentEditableWarning
+							data-path={`experience.${idx}.company`}
+							onBlur={handleBlur}
+						>
+							{exp.company}
 						</p>
-						<ul className="list-disc list-inside text-gray-600 mt-2">
-							{exp.details.map((d, i) => (
+						<ul className="list-disc list-outside ml-5 text-gray-600 space-y-1">
+							{exp.details.map((detail, i) => (
 								<li
 									key={i}
+									className="outline-none focus:bg-blue-50 rounded px-1"
 									contentEditable={editable}
 									suppressContentEditableWarning
 									data-path={`experience.${idx}.details.${i}`}
-									onInput={handleInput}
+									onBlur={handleBlur}
 								>
-									{d}
+									{detail}
 								</li>
 							))}
 						</ul>
@@ -171,41 +189,40 @@ const CVTemplate: React.FC<CVTemplateProps> = ({
 				))}
 			</section>
 
-			{/* Education */}
+			{/* Education Section */}
 			<section>
-				<h3 className="text-xl font-semibold text-gray-700 mb-2 flex flex-wrap gap-2">
-					Education
+				<h3 className="text-xs uppercase tracking-widest font-bold text-gray-400 mb-3">
+					Academic Background
 				</h3>
-				<div className="flex flex-wrap gap-5">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					{cv.education.map((edu, idx) => (
-						<div key={idx} className="mb-2">
+						<div key={idx} className="border-l-2 border-gray-100 pl-4">
 							<p
-								className="font-medium text-gray-800"
+								className="font-bold text-gray-800 outline-none"
 								contentEditable={editable}
 								suppressContentEditableWarning
 								data-path={`education.${idx}.school`}
-								onInput={handleInput}
+								onBlur={handleBlur}
 							>
 								{edu.school}
 							</p>
-							<p className="text-sm text-gray-500">
-								<span
-									contentEditable={editable}
-									suppressContentEditableWarning
-									data-path={`education.${idx}.degree`}
-									onInput={handleInput}
-								>
-									{edu.degree}
-								</span>{" "}
-								•{" "}
-								<span
-									contentEditable={editable}
-									suppressContentEditableWarning
-									data-path={`education.${idx}.year`}
-									onInput={handleInput}
-								>
-									{edu.year}
-								</span>
+							<p
+								className="text-sm text-gray-600 outline-none"
+								contentEditable={editable}
+								suppressContentEditableWarning
+								data-path={`education.${idx}.degree`}
+								onBlur={handleBlur}
+							>
+								{edu.degree}
+							</p>
+							<p
+								className="text-xs text-gray-400 mt-1 outline-none"
+								contentEditable={editable}
+								suppressContentEditableWarning
+								data-path={`education.${idx}.year`}
+								onBlur={handleBlur}
+							>
+								{edu.year}
 							</p>
 						</div>
 					))}
