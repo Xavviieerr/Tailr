@@ -6,6 +6,7 @@ import type { AppDispatch, RootState } from "../store";
 import { saveCVToBackend } from "../store/cvSaveSlice";
 import { useAuth } from "@clerk/clerk-react";
 import SaveCVModal from "../components/saveCvModal";
+import { clearCv } from "../store/generateCvSlice";
 
 const DashboardHome = () => {
 	const { getToken } = useAuth();
@@ -39,12 +40,12 @@ const DashboardHome = () => {
 			company: formData.company,
 			content: cv?.cv,
 		};
-		console.log(cvData);
 		try {
 			const token = await getToken();
 			if (token) {
 				await dispatch(saveCVToBackend({ cvData, token })).unwrap();
 				alert("CV Saved Successfully!");
+				dispatch(clearCv());
 			}
 		} catch (err) {
 			alert(`Save failed: ${err}`);
