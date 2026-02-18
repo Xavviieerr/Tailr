@@ -1,5 +1,4 @@
 import DashboardSideBar from "../components/layout/DashboardSideBar";
-import { SignOutButton } from "@clerk/clerk-react";
 import { type SideBarItemType } from "../types/dashboardTypes";
 import { FileText, Home, User } from "lucide-react";
 import { Outlet } from "react-router-dom";

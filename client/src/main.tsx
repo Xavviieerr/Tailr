@@ -10,11 +10,9 @@ import "@fontsource/plus-jakarta-sans/700.css";
 import "@fontsource/plus-jakarta-sans/800.css";
 import App from "./App.tsx";
 import { ClerkProvider } from "@clerk/clerk-react";
-import { AuthSyncManager } from "./components/AuthSyncManager.tsx";
 import { Provider } from "react-redux";
 import { store } from "./store/index.ts";
 
-// Imports clerk authentication publishable key.
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
