@@ -4,10 +4,12 @@ import { Edit, Eye, Trash2 } from "lucide-react";
 
 interface DashboradApplicationProps {
 	cvs: DashboardApplicationType[];
+	onEdit?: (cv: DashboardApplicationType) => void;
 }
 
 const DashboardApplicationItems: React.FC<DashboradApplicationProps> = ({
 	cvs,
+	onEdit,
 }) => {
 	return (
 		<>
@@ -67,6 +69,7 @@ const DashboardApplicationItems: React.FC<DashboradApplicationProps> = ({
 											<Eye size={18} />
 										</button>
 										<button
+											onClick={() => onEdit && onEdit(cv)}
 											className="p-2 rounded-lg hover:bg-purple-50 text-purple-600 transition"
 											title="Edit CV"
 										>

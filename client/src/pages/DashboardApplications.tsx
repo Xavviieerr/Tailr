@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import DashboardApplicationItems from "../components/DashboardApplicationItems";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import type { AppDispatch, RootState } from "../store";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +11,18 @@ const DashboardApplications = () => {
 	const { getToken } = useAuth();
 	const dispatch = useDispatch<AppDispatch>();
 	const { cvs, loading, error } = useSelector((state: RootState) => state.cvs);
+	const navigate = useNavigate();
+
+	const handleEdit = (cv: any) => {
+		console.log("Editing CV:", cv.id);
+		try {
+			//get the full info of the single cv
+			localStorage.setItem("activeCv", JSON.stringify(cv));
+			navigate("/dashboard/home");
+		} catch (e) {
+			console.error("Failed to set activeCv", e);
+		}
+	};
 
 	useEffect(() => {
 		const loadCv = async () => {
@@ -32,7 +45,7 @@ const DashboardApplications = () => {
 				</span>
 			</div>
 			<div className="maincontent m-10 h-96 p-2 shadow-md overflow-y-scroll">
-				<DashboardApplicationItems cvs={cvs} />
+				<DashboardApplicationItems cvs={cvs} onEdit={handleEdit} />
 			</div>
 		</div>
 	);

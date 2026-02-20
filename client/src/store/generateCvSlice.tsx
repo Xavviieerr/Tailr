@@ -26,7 +26,7 @@ export const generateCV = createAsyncThunk(
 		}
 	},
 );
-const savedCv = localStorage.getItem("generatedCv");
+const savedCv = localStorage.getItem("activeCv");
 
 const initialState: GenerateCVState = {
 	cv: savedCv ? JSON.parse(savedCv) : null,
@@ -40,7 +40,11 @@ const generateCvSlice = createSlice({
 	reducers: {
 		clearCv: (state) => {
 			state.cv = null;
-			localStorage.removeItem("generatedCv");
+			localStorage.removeItem("activeCv");
+		},
+		setCv: (state, action) => {
+			state.cv = action.payload;
+			localStorage.setItem("activeCv", JSON.stringify(action.payload));
 		},
 	},
 	extraReducers: (builder) => {
@@ -51,7 +55,7 @@ const generateCvSlice = createSlice({
 			.addCase(generateCV.fulfilled, (state, action) => {
 				state.loading = false;
 				state.cv = action.payload;
-				localStorage.setItem("generatedCv", JSON.stringify(action.payload));
+				localStorage.setItem("activeCv", JSON.stringify(action.payload));
 			})
 			.addCase(generateCV.rejected, (state, action) => {
 				state.loading = false;
@@ -60,5 +64,5 @@ const generateCvSlice = createSlice({
 	},
 });
 
-export const { clearCv } = generateCvSlice.actions;
+export const { clearCv, setCv } = generateCvSlice.actions;
 export default generateCvSlice.reducer;

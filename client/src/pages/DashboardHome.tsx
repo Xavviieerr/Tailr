@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import JobInfoForm from "../components/JobInfoForm";
 import CVtemplate from "../assets/template/CVtemplate";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,12 +6,25 @@ import type { AppDispatch, RootState } from "../store";
 import { saveCVToBackend } from "../store/cvSaveSlice";
 import { useAuth } from "@clerk/clerk-react";
 import SaveCVModal from "../components/saveCvModal";
-import { clearCv } from "../store/generateCvSlice";
+import { clearCv, setCv } from "../store/generateCvSlice";
 
 const DashboardHome = () => {
 	const { getToken } = useAuth();
 	const { cv } = useSelector((state: RootState) => state.cv);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+		try {
+			const raw = localStorage.getItem("activeCv");
+			if (raw) {
+				const parsed = JSON.parse(raw);
+				dispatch(setCv(parsed));
+			}
+		} catch (e) {
+			console.error("Failed to hydrate activeCv", e);
+		}
+	}, [dispatch]);
 
 	const handleSaveClick = () => {
 		if (!cv?.cv) return alert("No CV to save");
@@ -21,7 +34,6 @@ const DashboardHome = () => {
 	const handlePrint = () => {
 		window.print();
 	};
-	const dispatch = useDispatch<AppDispatch>();
 
 	const handleSave = async (formData: {
 		name: string;
