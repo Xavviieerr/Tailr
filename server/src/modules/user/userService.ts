@@ -43,7 +43,6 @@ export const syncUser = async ({
 };
 
 export const getUserByClerkId = async (clerkUserId: string) => {
-	console.log("Getting user by clerk ID:", clerkUserId);
 	const user = await userRepo.findByClerkId(clerkUserId);
 
 	if (!user) {

@@ -1,39 +1,46 @@
 import React, { useEffect, useState } from "react";
 import JobInfoForm from "../components/JobInfoForm";
-import CVtemplate from "../assets/template/CVtemplate";
+import CVTemplate from "../assets/template/CVtemplate";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../store";
 import { saveCVToBackend } from "../store/cvSaveSlice";
 import { useAuth } from "@clerk/clerk-react";
 import SaveCVModal from "../components/saveCvModal";
-import { clearCv, setCv } from "../store/generateCvSlice";
+import { clearCv, setCv, updateCv } from "../store/generateCvSlice";
+import { saveEditToBackend } from "../store/editCvSlice";
 
 const DashboardHome = () => {
 	const { getToken } = useAuth();
-	const { cv } = useSelector((state: RootState) => state.cv);
-	const [isModalOpen, setIsModalOpen] = useState(false);
 	const dispatch = useDispatch<AppDispatch>();
+	const { cv } = useSelector((state: RootState) => state.cv);
+
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	useEffect(() => {
-		try {
-			const raw = localStorage.getItem("activeCv");
-			if (raw) {
-				const parsed = JSON.parse(raw);
-				dispatch(setCv(parsed));
-			}
-		} catch (e) {
-			console.error("Failed to hydrate activeCv", e);
-		}
+		const raw = localStorage.getItem("activeCv");
+		if (raw) dispatch(setCv(JSON.parse(raw)));
 	}, [dispatch]);
 
 	const handleSaveClick = () => {
-		if (!cv?.cv) return alert("No CV to save");
+		if (!cv) return alert("No CV to save");
 		setIsModalOpen(true);
 	};
 
-	const handlePrint = () => {
-		window.print();
+	const handleeditsave = async () => {
+		if (!cv) return alert("No CV to save");
+		if (!cv.id) return alert("Missing CV id");
+
+		const token = await getToken();
+		if (!token) return;
+
+		const cvData = { id: cv.id, sections: cv.sections };
+		console.log("Saving CV edit, id:", cv.id);
+
+		await dispatch(saveEditToBackend({ cvData, token }));
+		dispatch(clearCv());
 	};
+
+	const handlePrint = () => window.print();
 
 	const handleSave = async (formData: {
 		name: string;
@@ -41,50 +48,62 @@ const DashboardHome = () => {
 		company: string;
 	}) => {
 		setIsModalOpen(false);
+		if (!cv) return;
 
-		if (!cv?.cv) {
-			return alert("No CV data found to save!");
-		}
+		const token = await getToken();
+		if (!token) return;
 
 		const cvData = {
 			name: formData.name,
 			jobTitle: formData.jobTitle,
 			company: formData.company,
-			content: cv?.cv,
+			content: { sections: cv.sections },
 		};
-		try {
-			const token = await getToken();
-			if (token) {
-				await dispatch(saveCVToBackend({ cvData, token })).unwrap();
-				alert("CV Saved Successfully!");
-				dispatch(clearCv());
-			}
-		} catch (err) {
-			alert(`Save failed: ${err}`);
-		}
+
+		await dispatch(saveCVToBackend({ cvData, token }));
+		dispatch(clearCv());
 	};
+
+	const handleTemplateChange = (updatedSections: any) => {
+		if (!cv) return;
+
+		dispatch(
+			updateCv({
+				...cv,
+				sections: updatedSections,
+			}),
+		);
+	};
+
 	return (
-		<div className="m-3 gap-3  h-full rounded-md flex">
-			<div className="rounded-md shadow-[0px_0px_4px_0px_rgba(0,0,0,0.3)] w-1/2 p-2">
+		<div className="m-3 gap-3 h-full rounded-md flex">
+			<div className="rounded-md shadow w-1/2 p-2">
 				<h1 className="font-bold text-lg text-gray-600">Job Description</h1>
-				<div className=" h-full overflow-y-scroll">
+				<div className="h-full overflow-y-scroll">
 					<JobInfoForm />
 				</div>
 			</div>
-			<div className="rounded-md shadow-[0px_0px_4px_0px_rgba(0,0,0,0.3)] w-1/2 p-2 h-auto overflow-y-scroll">
-				<div className="flex gap-3 justify-evenly border-b  border-blue-900">
+
+			<div className="rounded-md shadow w-1/2 p-2 overflow-y-scroll">
+				<div className="flex gap-3 justify-evenly border-b border-blue-900">
 					<button
 						onClick={handlePrint}
-						className="mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
+						className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
 					>
 						Download CV
 					</button>
 
 					<button
-						onClick={handleSaveClick}
-						className=" mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
+						onClick={() => {
+							if (cv?.id) {
+								handleeditsave();
+							} else {
+								handleSaveClick();
+							}
+						}}
+						className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
 					>
-						Save new cv
+						Save CV
 					</button>
 
 					<SaveCVModal
@@ -93,8 +112,9 @@ const DashboardHome = () => {
 						onConfirm={handleSave}
 					/>
 				</div>
+
 				<div id="cv-template">
-					<CVtemplate data={cv?.cv as any} />
+					{cv && <CVTemplate data={cv} onChange={handleTemplateChange} />}
 				</div>
 			</div>
 		</div>

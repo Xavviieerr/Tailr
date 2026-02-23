@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { transformRawToSections } from "../../utils/cvTransformer";
 
-const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
+const CVTemplate = ({ data, editable = true, onChange }: any) => {
 	const [sections, setSections] = useState<any[]>([]);
 
 	useEffect(() => {
-		setSections(transformRawToSections(data));
+		if (data?.sections) {
+			setSections(transformRawToSections(data));
+		}
 	}, [data]);
 
 	const handleBlur = (
@@ -17,7 +19,6 @@ const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
 
 		setSections((prev) => {
 			const next = JSON.parse(JSON.stringify(prev));
-
 			const keys = path.split(".");
 			let current = next[sectionIndex].data;
 
@@ -27,7 +28,14 @@ const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
 
 			current[keys[keys.length - 1]] = value;
 
-			if (onChange) onChange(next);
+			if (onChange)
+				onChange(
+					next.map((s: any) => ({
+						type: s.type,
+						title: s.title,
+						data: s.data,
+					})),
+				);
 
 			return next;
 		});
@@ -60,7 +68,6 @@ const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
 								<p>
 									{section.data.email} | {section.data.phone} |{" "}
 									{section.data.location}
-									{section.data.linkedin && ` | ${section.data.linkedin}`}
 								</p>
 							</div>
 						);
@@ -80,18 +87,23 @@ const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
 						);
 
 					case "skills":
+					case "education":
+					case "projects":
+					case "portfolio":
 						return (
-							<div key={sIndex} className="mb-6 border-b">
-								<h3>{section.title}</h3>
-								<ul>
-									{section.data.items.map((skill: string, i: number) => (
+							<div key={sIndex} className="mb-6">
+								<h3 className="text-xl font-semibold border-b mb-2">
+									{section.title}
+								</h3>
+								<ul className="list-disc ml-5">
+									{section.data.items?.map((item: any, i: number) => (
 										<li
 											key={i}
 											contentEditable={editable}
 											suppressContentEditableWarning
 											onBlur={(e) => handleBlur(e, sIndex, `items.${i}`)}
 										>
-											{skill}
+											{typeof item === "string" ? item : JSON.stringify(item)}
 										</li>
 									))}
 								</ul>
@@ -100,15 +112,14 @@ const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
 
 					case "experience":
 						return (
-							<div key={sIndex} className="mb-6 broder-b">
+							<div key={sIndex} className="mb-6">
 								<h3>{section.title}</h3>
-
-								{section.data.items.map((exp: any, i: number) => (
+								{section.data.items?.map((exp: any, i: number) => (
 									<div key={i}>
-										<strong>{exp.role}</strong> <span>{exp.duration}</span>
-										<p>{exp.company}</p>
+										<strong>{exp?.role}</strong> <span>{exp?.duration}</span>
+										<p>{exp?.company}</p>
 										<ul>
-											{exp.details?.map((d: string, j: number) => (
+											{exp?.details?.map((d: string, j: number) => (
 												<li key={j}>{d}</li>
 											))}
 										</ul>
@@ -116,40 +127,9 @@ const CVTemplate: React.FC<any> = ({ data, editable = true, onChange }) => {
 								))}
 							</div>
 						);
-					case "education":
-					case "portfolio":
-					case "projects":
-					case "skills":
-						return (
-							<div key={sIndex} className="mb-6">
-								<h3 className="text-xl font-semibold border-b mb-2">
-									{section.title}
-								</h3>
-								<ul className="list-disc ml-5">
-									{section.data.items.map((item: any, i: number) => (
-										<li
-											key={i}
-											contentEditable={editable}
-											suppressContentEditableWarning
-											onBlur={(e) => handleBlur(e, sIndex, `items.${i}`)}
-											className="mb-1"
-										>
-											{/* If item is an object (like portfolio links), handle accordingly */}
-											{typeof item === "string" ? item : JSON.stringify(item)}
-										</li>
-									))}
-								</ul>
-							</div>
-						);
 
 					default:
-						// fallback renderer for any unknown section
-						return (
-							<div key={sIndex} className="mb-6">
-								<h3>{section.title}</h3>
-								<pre>{JSON.stringify(section.data, null, 2)}</pre>
-							</div>
-						);
+						return null;
 				}
 			})}
 		</div>

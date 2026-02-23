@@ -79,12 +79,18 @@ export const updateCv = async (
 	req: AuthRequest & Request<CvParams>,
 	res: Response,
 ) => {
-	const cvId = Number(req.params.id);
+	let cvId = Number(req.params.id);
+	if (Number.isNaN(cvId) && req.body && typeof req.body.id !== "undefined") {
+		cvId = Number(req.body.id);
+	}
+	if (Number.isNaN(cvId)) {
+		return res.status(400).json({ error: "Invalid CV id" });
+	}
 	const { clerkUserId } = req.auth!;
 	const data = req.body;
 
 	const user = await userService.getUserByClerkId(clerkUserId);
-
+	console.log(cvId, user, data);
 	const updatedCv = await cvService.updateCvByIdForUser(cvId, user.id, data);
 
 	if (!updatedCv) {
@@ -99,7 +105,13 @@ export const deleteCv = async (
 	req: AuthRequest & Request<CvParams>,
 	res: Response,
 ) => {
-	const cvId = Number(req.params.id);
+	let cvId = Number(req.params.id);
+	if (Number.isNaN(cvId) && req.body && typeof req.body.id !== "undefined") {
+		cvId = Number(req.body.id);
+	}
+	if (Number.isNaN(cvId)) {
+		return res.status(400).json({ error: "Invalid CV id" });
+	}
 	const { clerkUserId } = req.auth!;
 	const user = await userService.getUserByClerkId(clerkUserId);
 

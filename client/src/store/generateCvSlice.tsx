@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiClient } from "../api/client";
+import { normalizeCv } from "../utils/normalizeCv";
 import type { GenerateCVState, JobInfo } from "../types/cv";
 
 export const generateCV = createAsyncThunk(
@@ -16,6 +17,7 @@ export const generateCV = createAsyncThunk(
 					body: jobInfo,
 				});
 			}
+
 			return await apiClient("/api/ai/generate", {
 				method: "POST",
 				headers: { Authorization: `Bearer ${token}` },
@@ -26,16 +28,17 @@ export const generateCV = createAsyncThunk(
 		}
 	},
 );
-const savedCv = localStorage.getItem("activeCv");
+
+const saved = localStorage.getItem("activeCv");
 
 const initialState: GenerateCVState = {
-	cv: savedCv ? JSON.parse(savedCv) : null,
+	cv: saved ? JSON.parse(saved) : null,
 	loading: false,
 	error: null,
 };
 
-const generateCvSlice = createSlice({
-	name: "ai",
+const slice = createSlice({
+	name: "cv",
 	initialState,
 	reducers: {
 		clearCv: (state) => {
@@ -43,6 +46,10 @@ const generateCvSlice = createSlice({
 			localStorage.removeItem("activeCv");
 		},
 		setCv: (state, action) => {
+			state.cv = action.payload;
+			localStorage.setItem("activeCv", JSON.stringify(action.payload));
+		},
+		updateCv: (state, action) => {
 			state.cv = action.payload;
 			localStorage.setItem("activeCv", JSON.stringify(action.payload));
 		},
@@ -54,8 +61,11 @@ const generateCvSlice = createSlice({
 			})
 			.addCase(generateCV.fulfilled, (state, action) => {
 				state.loading = false;
-				state.cv = action.payload;
-				localStorage.setItem("activeCv", JSON.stringify(action.payload));
+
+				const normalized = normalizeCv(action.payload);
+
+				state.cv = normalized;
+				localStorage.setItem("activeCv", JSON.stringify(normalized));
 			})
 			.addCase(generateCV.rejected, (state, action) => {
 				state.loading = false;
@@ -64,5 +74,5 @@ const generateCvSlice = createSlice({
 	},
 });
 
-export const { clearCv, setCv } = generateCvSlice.actions;
-export default generateCvSlice.reducer;
+export const { clearCv, setCv, updateCv } = slice.actions;
+export default slice.reducer;
