@@ -8,6 +8,7 @@ import { useAuth } from "@clerk/clerk-react";
 import SaveCVModal from "../components/saveCvModal";
 import { clearCv, setCv, updateCv } from "../store/generateCvSlice";
 import { saveEditToBackend } from "../store/editCvSlice";
+import { toast } from "react-toastify";
 
 const DashboardHome = () => {
 	const { getToken } = useAuth();
@@ -22,22 +23,27 @@ const DashboardHome = () => {
 	}, [dispatch]);
 
 	const handleSaveClick = () => {
-		if (!cv) return alert("No CV to save");
+		if (!cv) return toast.error("No CV to save");
 		setIsModalOpen(true);
 	};
 
 	const handleeditsave = async () => {
-		if (!cv) return alert("No CV to save");
-		if (!cv.id) return alert("Missing CV id");
+		if (!cv) return toast.error("No CV to save");
+		if (!cv.id) return toast.error("Missing CV id");
 
 		const token = await getToken();
-		if (!token) return;
+		if (!token) return toast.error("Authentication token missing");
 
 		const cvData = { id: cv.id, sections: cv.sections };
 		console.log("Saving CV edit, id:", cv.id);
 
-		await dispatch(saveEditToBackend({ cvData, token }));
-		dispatch(clearCv());
+		try {
+			await dispatch(saveEditToBackend({ cvData, token })).unwrap();
+			toast.success("CV updated successfully");
+			dispatch(clearCv());
+		} catch (err: any) {
+			toast.error(err?.message || "Failed to save CV edits");
+		}
 	};
 
 	const handlePrint = () => window.print();
@@ -60,8 +66,13 @@ const DashboardHome = () => {
 			content: { sections: cv.sections },
 		};
 
-		await dispatch(saveCVToBackend({ cvData, token }));
-		dispatch(clearCv());
+		try {
+			await dispatch(saveCVToBackend({ cvData, token })).unwrap();
+			toast.success("CV saved successfully");
+			dispatch(clearCv());
+		} catch (err: any) {
+			toast.error(err?.message || "Failed to save CV");
+		}
 	};
 
 	const handleTemplateChange = (updatedSections: any) => {

@@ -9,6 +9,8 @@ import "@fontsource/plus-jakarta-sans/600.css";
 import "@fontsource/plus-jakarta-sans/700.css";
 import "@fontsource/plus-jakarta-sans/800.css";
 import App from "./App.tsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { Provider } from "react-redux";
 import { store } from "./store/index.ts";
@@ -23,7 +25,10 @@ createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<ClerkProvider publishableKey={PUBLISHABLE_KEY}>
 			<Provider store={store}>
-				<App />
+				<>
+					<App />
+					<ToastContainer position="top-right" />
+				</>
 			</Provider>
 		</ClerkProvider>
 	</StrictMode>,
