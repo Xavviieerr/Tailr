@@ -63,6 +63,7 @@ const DashboardApplicationItems: React.FC<DashboradApplicationProps> = ({
 									</td>
 									<td className="px-4 py-3 flex justify-center gap-3">
 										<button
+											onClick={() => onEdit && onEdit(cv)}
 											className="p-2 rounded-lg hover:bg-blue-50 text-blue-600 transition"
 											title="View CV"
 										>

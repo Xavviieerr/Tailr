@@ -46,6 +46,13 @@ const JobInfoForm: React.FC = () => {
 		if (jobInfo.file) form.append("previousCv", jobInfo.file as File);
 
 		dispatch(generateCV({ token, jobInfo: form }));
+		setJobInfo({
+			title: "",
+			description: "",
+			company: "",
+			notes: "",
+			file: null,
+		});
 	};
 	if (loading) return <Loader />;
 	if (error) return <div className="text-red-500">Error: {error}</div>;
