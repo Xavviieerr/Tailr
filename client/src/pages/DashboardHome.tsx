@@ -75,6 +75,7 @@ const DashboardHome = () => {
 		}
 	};
 
+	//saves cv
 	const handleTemplateChange = (updatedSections: any) => {
 		if (!cv) return;
 
