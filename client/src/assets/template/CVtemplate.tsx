@@ -1,276 +1,137 @@
 import React, { useEffect, useState } from "react";
+import { transformRawToSections } from "../../utils/cvTransformer";
 
-// interface CVDta {
-// 	name: string;
-// 	title: string;
-//   summary: string;
-
-// 	contact: {
-// 		email: string;
-// 		phone?: string;
-// 		location: string;
-// 		linkedinUrl?: string;
-// 		githubUrl?: string;
-// 	};
-
-// 	experience: {
-// 		role: string;
-// 		company: string;
-// 		duration: string;
-// 		achievements: string[];
-// 	}[];
-
-// 	education: {
-// 		school: string;
-// 		degree: string;
-// 		durationOrYear: string;
-// 	}[];
-
-// 	skills: string[];
-// 	awardsAndCertifications?: string[];
-// }
-interface CVData {
-	name: string;
-	title: string;
-	summary: string;
-	contact: {
-		email: string;
-		phone: string;
-		location: string;
-	};
-	skills: string[];
-	experience: {
-		role: string;
-		company: string;
-		duration: string;
-		details: string[];
-	}[];
-	education: {
-		school: string;
-		degree: string;
-		year: string;
-	}[];
-}
-
-interface CVTemplateProps {
-	data: CVData;
-	editable?: boolean;
-	onChange?: (updated: CVData) => void;
-}
-
-const CVTemplate: React.FC<CVTemplateProps> = ({
-	data,
-	editable = true,
-	onChange,
-}) => {
-	const [cv, setCv] = useState<CVData>(data);
-
-	useEffect(() => setCv(data), [data]);
+const CVTemplate = ({ data, editable = true, onChange }: any) => {
+	const [sections, setSections] = useState<any[]>([]);
 
 	useEffect(() => {
-		if (onChange) onChange(cv);
-	}, [cv, onChange]);
+		if (data?.sections) {
+			setSections(transformRawToSections(data));
+		}
+	}, [data]);
 
-	const handleInput = (e: React.FormEvent<HTMLElement>) => {
-		const target = e.currentTarget as HTMLElement;
-		const path = target.getAttribute("data-path");
-		if (!path) return;
-		const text = target.textContent ?? "";
+	const handleBlur = (
+		e: React.FocusEvent<HTMLElement>,
+		sectionIndex: number,
+		path: string,
+	) => {
+		const value = e.currentTarget.textContent ?? "";
 
-		setCv((prev) => {
-			const next: any = JSON.parse(JSON.stringify(prev));
-			const parts = path.split(".");
-			let cur: any = next;
-			for (let i = 0; i < parts.length - 1; i++) {
-				const p = parts[i];
-				const key = Number.isFinite(Number(p)) ? Number(p) : p;
-				if (cur[key] === undefined) cur[key] = {};
-				cur = cur[key];
+		setSections((prev) => {
+			const next = JSON.parse(JSON.stringify(prev));
+			const keys = path.split(".");
+			let current = next[sectionIndex].data;
+
+			for (let i = 0; i < keys.length - 1; i++) {
+				current = current[keys[i]];
 			}
-			const last = parts[parts.length - 1];
-			const lastKey = Number.isFinite(Number(last)) ? Number(last) : last;
-			cur[lastKey] = text;
+
+			current[keys[keys.length - 1]] = value;
+
+			if (onChange)
+				onChange(
+					next.map((s: any) => ({
+						type: s.type,
+						title: s.title,
+						data: s.data,
+					})),
+				);
+
 			return next;
 		});
 	};
 
 	return (
-		<div id="cv-template" className="max-w-3xl mx-auto bg-white rounded-lg p-8">
-			{/* Header */}
-			<header className="border-b border-gray-300 pb-4 mb-4">
-				<h1
-					className="text-3xl font-bold text-gray-800"
-					contentEditable={editable}
-					suppressContentEditableWarning
-					data-path="name"
-					onInput={handleInput}
-				>
-					{cv.name}
-				</h1>
-				<h2
-					className="text-lg text-blue-600 font-medium"
-					contentEditable={editable}
-					suppressContentEditableWarning
-					data-path="title"
-					onInput={handleInput}
-				>
-					{cv.title}
-				</h2>
-				<p className="text-sm text-gray-500 mt-2">
-					<span
-						contentEditable={editable}
-						suppressContentEditableWarning
-						data-path="contact.email"
-						onInput={handleInput}
-					>
-						{cv.contact.email}
-					</span>{" "}
-					|{" "}
-					<span
-						contentEditable={editable}
-						suppressContentEditableWarning
-						data-path="contact.phone"
-						onInput={handleInput}
-					>
-						{cv.contact.phone}
-					</span>{" "}
-					|{" "}
-					<span
-						contentEditable={editable}
-						suppressContentEditableWarning
-						data-path="contact.location"
-						onInput={handleInput}
-					>
-						{cv.contact.location}
-					</span>
-				</p>
-			</header>
-
-			{/* Summary */}
-			<section className="mb-6">
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">
-					Profile Summary
-				</h3>
-				<p
-					className="text-gray-600 leading-relaxed"
-					contentEditable={editable}
-					suppressContentEditableWarning
-					data-path="summary"
-					onInput={handleInput}
-				>
-					{cv.summary}
-				</p>
-			</section>
-
-			{/* Skills */}
-			<section className="mb-6">
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">Skills</h3>
-				<ul className="flex flex-wrap gap-2">
-					{cv.skills.map((skill, idx) => (
-						<li
-							key={idx}
-							className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-							contentEditable={editable}
-							suppressContentEditableWarning
-							data-path={`skills.${idx}`}
-							onInput={handleInput}
-						>
-							{skill}
-						</li>
-					))}
-				</ul>
-			</section>
-
-			{/* Experience */}
-			<section className="mb-6">
-				<h3 className="text-xl font-semibold text-gray-700 mb-2">Experience</h3>
-				{cv.experience.map((exp, idx) => (
-					<div key={idx} className="mb-4">
-						<h4
-							className="text-lg font-semibold text-gray-800"
-							contentEditable={editable}
-							suppressContentEditableWarning
-							data-path={`experience.${idx}.role`}
-							onInput={handleInput}
-						>
-							{exp.role}
-						</h4>
-						<p className="text-sm text-gray-500">
-							<span
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`experience.${idx}.company`}
-								onInput={handleInput}
-							>
-								{exp.company}
-							</span>{" "}
-							•{" "}
-							<span
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`experience.${idx}.duration`}
-								onInput={handleInput}
-							>
-								{exp.duration}
-							</span>
-						</p>
-						<ul className="list-disc list-inside text-gray-600 mt-2">
-							{exp.details.map((d, i) => (
-								<li
-									key={i}
+		<div className="max-w-3xl mx-auto bg-white p-10 shadow-lg my-10">
+			{sections.map((section, sIndex) => {
+				switch (section.type) {
+					case "header":
+						return (
+							<div key={sIndex} className="mb-8 border-b pb-6">
+								<h1
 									contentEditable={editable}
 									suppressContentEditableWarning
-									data-path={`experience.${idx}.details.${i}`}
-									onInput={handleInput}
+									onBlur={(e) => handleBlur(e, sIndex, "name")}
+									className="text-3xl font-bold"
 								>
-									{d}
-								</li>
-							))}
-						</ul>
-					</div>
-				))}
-			</section>
+									{section.data.name}
+								</h1>
 
-			{/* Education */}
-			<section>
-				<h3 className="text-xl font-semibold text-gray-700 mb-2 flex flex-wrap gap-2">
-					Education
-				</h3>
-				<div className="flex flex-wrap gap-5">
-					{cv.education.map((edu, idx) => (
-						<div key={idx} className="mb-2">
-							<p
-								className="font-medium text-gray-800"
-								contentEditable={editable}
-								suppressContentEditableWarning
-								data-path={`education.${idx}.school`}
-								onInput={handleInput}
-							>
-								{edu.school}
-							</p>
-							<p className="text-sm text-gray-500">
-								<span
+								<p
 									contentEditable={editable}
 									suppressContentEditableWarning
-									data-path={`education.${idx}.degree`}
-									onInput={handleInput}
+									onBlur={(e) => handleBlur(e, sIndex, "title")}
 								>
-									{edu.degree}
-								</span>{" "}
-								•{" "}
-								<span
+									{section.data.title}
+								</p>
+
+								<p>
+									{section.data.email} | {section.data.phone} |{" "}
+									{section.data.location}
+								</p>
+							</div>
+						);
+
+					case "summary":
+						return (
+							<div key={sIndex} className="mb-6 border-b">
+								<h3>{section.title}</h3>
+								<p
 									contentEditable={editable}
 									suppressContentEditableWarning
-									data-path={`education.${idx}.year`}
-									onInput={handleInput}
+									onBlur={(e) => handleBlur(e, sIndex, "")}
 								>
-									{edu.year}
-								</span>
-							</p>
-						</div>
-					))}
-				</div>
-			</section>
+									{section.data}
+								</p>
+							</div>
+						);
+
+					case "skills":
+					case "education":
+					case "projects":
+					case "portfolio":
+						return (
+							<div key={sIndex} className="mb-6">
+								<h3 className="text-xl font-semibold border-b mb-2">
+									{section.title}
+								</h3>
+								<ul className="list-disc ml-5">
+									{section.data.items?.map((item: any, i: number) => (
+										<li
+											key={i}
+											contentEditable={editable}
+											suppressContentEditableWarning
+											onBlur={(e) => handleBlur(e, sIndex, `items.${i}`)}
+										>
+											{typeof item === "string" ? item : JSON.stringify(item)}
+										</li>
+									))}
+								</ul>
+							</div>
+						);
+
+					case "experience":
+						return (
+							<div key={sIndex} className="mb-6">
+								<h3>{section.title}</h3>
+								{section.data.items?.map((exp: any, i: number) => (
+									<div key={i}>
+										<strong>{exp?.role}</strong> <span>{exp?.duration}</span>
+										<p>{exp?.company}</p>
+										<ul>
+											{exp?.details?.map((d: string, j: number) => (
+												<li key={j}>{d}</li>
+											))}
+										</ul>
+									</div>
+								))}
+							</div>
+						);
+
+					default:
+						return null;
+				}
+			})}
 		</div>
 	);
 };

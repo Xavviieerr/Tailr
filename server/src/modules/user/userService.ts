@@ -1,11 +1,9 @@
 import * as userRepo from "./userRepository";
 
-//checsk if user exists by clerk id
 export const findUserByClerkId = async (clerkUserId: string) => {
 	return userRepo.findByClerkId(clerkUserId);
 };
 
-//throws error if user does not exist
 export const requireUserByClerkId = async (clerkUserId: string) => {
 	const user = await userRepo.findByClerkId(clerkUserId);
 
@@ -45,7 +43,6 @@ export const syncUser = async ({
 };
 
 export const getUserByClerkId = async (clerkUserId: string) => {
-	console.log("Getting user by clerk ID:", clerkUserId);
 	const user = await userRepo.findByClerkId(clerkUserId);
 
 	if (!user) {

@@ -1,95 +1,133 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import JobInfoForm from "../components/JobInfoForm";
-import CVtemplate from "../assets/template/CVtemplate";
-
-const sampleData = {
-	name: "Chidera Ogbu",
-	title: "Frontend Developer",
-	summary:
-		"Creative and detail-oriented developer skilled in building scalable web applications using React, TypeScript, and Tailwind CSS.",
-	contact: {
-		email: "chidera@example.com",
-		phone: "+234 812 345 6789",
-		location: "Lagos, Nigeria",
-	},
-	skills: ["React", "TypeScript", "Tailwind CSS", "Node.js", "PostgreSQL"],
-	experience: [
-		{
-			role: "Frontend Engineer",
-			company: "Techify Ltd.",
-			duration: "2022 - Present",
-			details: [
-				"Built and optimized responsive dashboards using React and Tailwind.",
-				"Collaborated with designers to improve UI/UX across 5 products.",
-			],
-		},
-	],
-	education: [
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-		{
-			school: "University of Lagos",
-			degree: "B.Sc. Computer Science",
-			year: "2021",
-		},
-	],
-};
+import CVTemplate from "../assets/template/CVtemplate";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store";
+import { saveCVToBackend } from "../store/cvSaveSlice";
+import { useAuth } from "@clerk/clerk-react";
+import SaveCVModal from "../components/saveCvModal";
+import { clearCv, setCv, updateCv } from "../store/generateCvSlice";
+import { saveEditToBackend } from "../store/editCvSlice";
+import { toast } from "react-toastify";
 
 const DashboardHome = () => {
-	const handlePrint = () => {
-		window.print();
+	const { getToken } = useAuth();
+	const dispatch = useDispatch<AppDispatch>();
+	const { cv } = useSelector((state: RootState) => state.cv);
+
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	useEffect(() => {
+		const raw = localStorage.getItem("activeCv");
+		if (raw) dispatch(setCv(JSON.parse(raw)));
+	}, [dispatch]);
+
+	const handleSaveClick = () => {
+		if (!cv) return toast.error("No CV to save");
+		setIsModalOpen(true);
 	};
 
-	const handleRedo = () => {
-		alert("redo");
+	const handleeditsave = async () => {
+		if (!cv) return toast.error("No CV to save");
+		if (!cv.id) return toast.error("Missing CV id");
+
+		const token = await getToken();
+		if (!token) return toast.error("Authentication token missing");
+
+		const cvData = { id: cv.id, sections: cv.sections };
+		console.log("Saving CV edit, id:", cv.id);
+
+		try {
+			await dispatch(saveEditToBackend({ cvData, token })).unwrap();
+			toast.success("CV updated successfully");
+			dispatch(clearCv());
+		} catch (err: any) {
+			toast.error(err?.message || "Failed to save CV edits");
+		}
 	};
 
-	const handleSave = () => {
-		alert("Save");
+	const handlePrint = () => window.print();
+
+	const handleSave = async (formData: {
+		name: string;
+		jobTitle: string;
+		company: string;
+	}) => {
+		setIsModalOpen(false);
+		if (!cv) return;
+
+		const token = await getToken();
+		if (!token) return;
+
+		const cvData = {
+			name: formData.name,
+			jobTitle: formData.jobTitle,
+			company: formData.company,
+			content: { sections: cv.sections },
+		};
+
+		try {
+			await dispatch(saveCVToBackend({ cvData, token })).unwrap();
+			toast.success("CV saved successfully");
+			dispatch(clearCv());
+		} catch (err: any) {
+			toast.error(err?.message || "Failed to save CV");
+		}
 	};
+
+	//saves cv
+	const handleTemplateChange = (updatedSections: any) => {
+		if (!cv) return;
+
+		dispatch(
+			updateCv({
+				...cv,
+				sections: updatedSections,
+			}),
+		);
+	};
+
 	return (
-		<div className="m-3 gap-3  h-full rounded-md flex">
-			<div className="rounded-md shadow-[0px_0px_4px_0px_rgba(0,0,0,0.3)] w-1/2 p-2">
+		<div className="m-3 gap-3 h-full rounded-md flex">
+			<div className="rounded-md shadow w-1/2 p-2">
 				<h1 className="font-bold text-lg text-gray-600">Job Description</h1>
-				<div className=" h-full overflow-y-scroll">
+				<div className="h-full overflow-y-scroll">
 					<JobInfoForm />
 				</div>
 			</div>
-			<div className="rounded-md shadow-[0px_0px_4px_0px_rgba(0,0,0,0.3)] w-1/2 p-2 h-auto overflow-y-scroll">
-				<div className="flex gap-3 justify-evenly border-b  border-blue-900">
+
+			<div className="rounded-md shadow w-1/2 p-2 overflow-y-scroll">
+				<div className="flex gap-3 justify-evenly border-b border-blue-900">
 					<button
 						onClick={handlePrint}
-						className="mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
+						className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
 					>
 						Download CV
 					</button>
+
 					<button
-						onClick={handleRedo}
-						className=" mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
+						onClick={() => {
+							if (cv?.id) {
+								handleeditsave();
+							} else {
+								handleSaveClick();
+							}
+						}}
+						className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
 					>
-						Redo
+						Save CV
 					</button>
-					<button
-						onClick={handleSave}
-						className=" mb-4 bg-blue-600 hover:animate-pulse text-white px-4 py-2 static rounded-lg hover:bg-blue-700"
-					>
-						Save
-					</button>
+
+					<SaveCVModal
+						isOpen={isModalOpen}
+						onClose={() => setIsModalOpen(false)}
+						onConfirm={handleSave}
+					/>
 				</div>
-				<CVtemplate data={sampleData} />
+
+				<div id="cv-template">
+					{cv && <CVTemplate data={cv} onChange={handleTemplateChange} />}
+				</div>
 			</div>
 		</div>
 	);
