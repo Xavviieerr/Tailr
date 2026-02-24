@@ -16,6 +16,10 @@
 		"isolatedModules": false,
 		"skipLibCheck": true
 	},
+	"paths": {
+		"@lib/*": ["lib/*"],
+		"@modules/*": ["modules/*"]
+	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]
 }
