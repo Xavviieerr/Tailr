@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+dist/
+
+# Ignore env files in subprojects
+/server/.env
+/server/.env.*
+/client/.env
+/client/.env.*
+
+# Ignore generated prisma client source (if present)
+/server/src/generated/
+/server/dist/src/generated/
