@@ -128,43 +128,6 @@ Design note: storing `content` as JSON gives frontend flexibility for templates/
 
 ---
 
-## Tests & CI
-
-- Add unit tests for services and repositories (Jest/Vitest) and integration tests for routes (supertest).
-- CI recommended steps:
-  1.  `npm ci`
-  2.  `npx prisma generate`
-  3.  `npm run build`
-  4.  `npm test`
-
-Suggested `server` `package.json` build script for CI:
-
-```json
-"scripts": {
-	"build": "npx prisma generate && tsc"
-}
-```
-
----
-
-## Key accomplishments & interview topics
-
-- Implemented a robust Prisma generation and resolution strategy to support both dev and compiled runtimes.
-- Used `pg.Pool` + `PrismaPg` to manage Postgres connections safely in cloud environments.
-- Enforced auth & authorization with Clerk and service-layer ownership checks.
-- Built a modular `controller → service → repository` structure for maintainability and testability.
-- Added operational concerns: rate limiting, error handling, and build-time generation for production predictability.
-
-Interview prompts you can discuss:
-
-1. Explain the `prisma.ts` runtime resolution approach and why it's needed.
-2. Discuss Postgres pooling strategies and why PgBouncer or `pg.Pool` matters for scaling.
-3. Walk through how you validate and authorize a CV update request.
-4. Compare storing CV content as JSON vs normalized tables.
-5. Outline how you'd add tracing and Prometheus metrics to this app.
-
----
-
 ## Contributing
 
 - Open issues for bugs or feature requests.
