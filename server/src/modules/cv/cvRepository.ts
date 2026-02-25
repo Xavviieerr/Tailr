@@ -1,5 +1,5 @@
 import { JsonObject } from "@prisma/client/runtime/client";
-import { CvCreateInput } from "../../../generated/prisma/models/Cv";
+import type { CvCreateInput } from "../../../generated/prisma/models/Cv";
 import { prisma } from "../../lib/prisma";
 
 export const createCv = async (data: CvCreateInput) => {

@@ -1,31 +1,32 @@
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
 
-datasource db {
-  provider = "postgresql"
-}
 
-model Cv {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  name      String
-  jobTitle  String
-  company   String
-  content   Json
+generator client {  
+  provider = "prisma-client"  
+  output   = "../src/generated/prisma"
+}  
+datasource db {   
+  provider = "postgresql" 
+}  
+  
+model Cv {   
+  id        Int      @id @default(autoincrement())   
+  userId    Int   
+  name      String   
+  jobTitle  String   
+  company   String   
+  content   Json   
+  createdAt DateTime @default(now())   
+  updatedAt DateTime  
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+}  
+
+model User {   
+  id        Int      @id @default(autoincrement())   
+  firstName String   
+  lastName  String   
+  email     String   @unique   
+  clerkId   String   @unique   
   createdAt DateTime @default(now())
-  updatedAt DateTime
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  clerkId   String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  Cv        Cv[]
+  updatedAt DateTime   
+  Cv        Cv[] 
 }
