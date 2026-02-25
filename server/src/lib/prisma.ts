@@ -3,12 +3,8 @@ import path from "path";
 import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// Try to load the generated Prisma client from the project's generated folder.
-// Use an absolute path based on process.cwd() so the import works both
-// in development (src/) and after compilation (dist/).
 let PrismaClientCtor: any;
-// Try a few locations in order so this works during dev (ts-node),
-// after compilation (dist/), and if you rely on the installed @prisma/client.
+
 const tryPaths = [
 	// compiled build location
 	path.join(process.cwd(), "dist", "src", "generated", "prisma", "client"),
