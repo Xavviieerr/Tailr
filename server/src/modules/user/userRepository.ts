@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import type { UserCreateInput } from "../../../generated/prisma/models/User";
+import type { UserCreateInput } from "../../generated/prisma/models/User";
 
 export const findByClerkId = async (clerkId: string) => {
 	try {
