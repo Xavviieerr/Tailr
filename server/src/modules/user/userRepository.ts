@@ -1,10 +1,15 @@
 import { prisma } from "../../lib/prisma";
-import { UserCreateInput } from "../../../generated/prisma/models/User";
+import type { UserCreateInput } from "../../../generated/prisma/models/User";
 
 export const findByClerkId = async (clerkId: string) => {
-	return prisma.user.findUnique({
-		where: { clerkId },
-	});
+	try {
+		return await prisma.user.findUnique({
+			where: { clerkId },
+		});
+	} catch (error) {
+		console.error("Prisma query failed:", error);
+		return null;
+	}
 };
 
 export const createUser = async (data: UserCreateInput) => {

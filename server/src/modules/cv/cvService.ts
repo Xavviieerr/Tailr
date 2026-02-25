@@ -1,7 +1,7 @@
 import * as userRepo from "../user/userRepository";
 import * as cvRepo from "./cvRepository";
 import { updateCv } from "./cvController";
-import { CvCreateInput } from "../../../generated/prisma/models";
+import type { CvCreateInput } from "../../../generated/prisma/models";
 import { JsonObject } from "@prisma/client/runtime/client";
 
 interface CreateCv {

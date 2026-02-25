@@ -1,4 +1,6 @@
 .env
+.env.local
+.env.production
 npm-debug.log
 .DS_Store
 /node_modules
@@ -10,5 +12,7 @@ npm-debug.log
 /src/generated/prisma
 
 /src/generated/prisma
+
+/generated/prisma
 
 /generated/prisma
